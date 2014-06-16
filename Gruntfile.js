@@ -9,23 +9,31 @@ module.exports = function (grunt) {
   //grunt.loadNpmTasks('grunt-shell');
   grunt.loadNpmTasks('grunt-contrib-connect');
 
+  var app_name = 'regi'
+  var app_prefix = '../fhirplace/resources/public/' + app_name + '/';
+
+  var main_js = app_prefix + 'main.js';
+
+  var files  = {};
+  files[main_js] = 'coffee/**/*.coffee';
+
   grunt.initConfig({
     clean: {
       options: { force: true },
-      main: ['../resources/public/assets/**/*']
+      main: [app_prefix + '**/*']
     },
     coffee: {
       app: {
         options: { join: true },
-        files: { '../resources/public/assets/js/main.js': 'coffee/**/*.coffee' }
+        files: files
       }
     },
    ngtemplates: {
       app: {
         src: 'views/**/*.html',
-        dest: '../resources/public/assets/js/views.js',
+        dest: app_prefix + 'views.js',
         options: {
-          module: 'fhirplaceGui',
+          module: app_name,
           prefix: '/'
         }
       }
@@ -36,7 +44,7 @@ module.exports = function (grunt) {
           expand: true,
           cwd: 'less',
           src: ['*.less', '!.*#.less'],
-          dest: '../resources/public/assets/css/',
+          dest: app_prefix + 'css/',
           ext: '.css'
         }]
       }
@@ -56,12 +64,11 @@ module.exports = function (grunt) {
           "lib/codemirror/mode/javascript/javascript.js",
           "lib/angular-ui-codemirror/ui-codemirror.js"
         ],
-        dest: '../resources/public/assets/js/lib.js'
+        dest: app_prefix + 'lib.js'
       },
       app_js: {
-        src: [ '../resources/public/assets/js/main.js',
-        '../resources/public/assets/js/views.js' ],
-        dest: '../resources/public/assets/js/app.js'
+        src: [ app_prefix + 'main.js', app_prefix + 'views.js' ],
+        dest: app_prefix + 'app.js'
       },
       lib_css: {
         src: ['lib/components-font-awesome/css/font-awesome.min.css',
@@ -69,7 +76,7 @@ module.exports = function (grunt) {
         'lib/bootstrap/dist/css/bootstrap.min.css',
         "lib/angular-formstamp/build/formstamp.css",
         ],
-        dest: '../resources/public/assets/css/lib.css'
+        dest: app_prefix + 'css/lib.css'
       }
     },
     copy: {
@@ -77,23 +84,23 @@ module.exports = function (grunt) {
         cwd: 'lib/bootstrap/dist/fonts/',
         expand: true,
         src: '*',
-        dest: '../resources/public/assets/fonts/'
+        dest: app_prefix + 'fonts/'
       },
       fa_fonts: {
         cwd: 'lib/components-font-awesome/fonts/',
         expand: true,
         src: '*',
-        dest: '../resources/public/assets/fonts/'
+        dest: app_prefix + 'fonts/'
       },
       hs_fonts: {
         cwd: 'fonts/',
         expand: true,
         src: '*',
-        dest: '../resources/public/assets/fonts/'
+        dest: app_prefix + 'fonts/'
      },
      index: {
        src: 'index.html',
-       dest: '../resources/public/index.html'
+       dest: app_prefix + 'index.html'
      }
     },
     watch: {
