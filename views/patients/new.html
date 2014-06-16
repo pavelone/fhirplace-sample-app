@@ -1,0 +1,63 @@
+<h1> Register new patient </h1>
+<hr/>
+
+<div class="row">
+  <div class="col-xs-6">
+    <div  ng-repeat="nm in entity.name">
+      <fieldset class="form-horizontal first-level">
+        <legend>Names </legend>
+        <fs-form-for model="nm">
+
+        <fs-input as="fs-select"
+        name="use"
+        items="nameUses"
+        freetext="true"
+        label="Use">{{ item }}</fs-input>
+
+        <fs-input as="fs-multiselect"
+        name="family"
+        items="names"
+        freetext="true"
+        label="Famliy">{{ item }}</fs-input>
+
+        <fs-input as="fs-multiselect"
+        name="given"
+        items="names"
+        freetext="true"
+        label="Given">{{ item }}</fs-input>
+        <div class="row">
+          <div class="btn-group pull-right">
+            <a class="btn btn-default" ng-click="removeName(nm)">Remove name</a>
+            <a class="btn btn-default" ng-click="addName()">Add name</a>
+          </div>
+        </div>
+        </fs-form-for>
+      </fieldset>
+    </div>
+
+    <fs-form-for model="entity">
+    <fieldset>
+      <legend>Patient Info</legend>
+      <fs-input as="text"
+      name="identifier[0].value"
+      label="Medical Record Number"></fs-input>
+
+      <fs-input as="fs-select"
+      name="gender"
+      items="genders"
+      freetext="true"
+      label="Gender">{{ item.coding[0].display }}</fs-input>
+
+      <fs-input as="text" name="birthDate" label="Birth Date"></fs-input>
+    </fieldset>
+    </fs-form-for>
+
+    <hr/>
+    <a class="btn btn-success" ng-click="register()">Register</a>
+    <a class="btn btn-default" href="#/patients">cancel</a>
+
+  </div>
+  <div class="col-xs-6">
+    <pre>{{entity | json}}</pre>
+  </div>
+</div>

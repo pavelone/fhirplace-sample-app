@@ -9,9 +9,8 @@
     "angular-cookies": "latest",
     "angular-sanitize": "latest",
     "angular-route": "latest",
+    "angular-formstamp": "latest",
     "angular-animate": "latest",
-    "components-font-awesome": "latest",
-    "angular-local-storage": "latest",
-    "angular-ui-codemirror": "latest"
+    "components-font-awesome": "latest"
   }
 }

@@ -59,10 +59,7 @@ module.exports = function (grunt) {
           "lib/angular-animate/angular-animate.js",
           "lib/angular-cookies/angular-cookies.js",
           "lib/angular-sanitize/angular-sanitize.js",
-          "lib/codemirror/lib/codemirror.js",
-          "lib/codemirror/mode/sql/sql.js",
-          "lib/codemirror/mode/javascript/javascript.js",
-          "lib/angular-ui-codemirror/ui-codemirror.js"
+          "lib/angular-formstamp/build/formstamp.js"
         ],
         dest: app_prefix + 'lib.js'
       },
@@ -72,7 +69,7 @@ module.exports = function (grunt) {
       },
       lib_css: {
         src: ['lib/components-font-awesome/css/font-awesome.min.css',
-        'lib/codemirror/lib/codemirror.css',
+        'lib/angular-formstamp/build/formstamp.css',
         'lib/bootstrap/dist/css/bootstrap.min.css',
         "lib/angular-formstamp/build/formstamp.css",
         ],

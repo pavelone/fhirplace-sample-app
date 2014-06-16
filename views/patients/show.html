@@ -1,0 +1,46 @@
+<h1> {{ patient.name[0] | humanName }} {{patient.gender.coding[0].code}}/{{ patient.birthDate | age}}</h1>
+
+<h3> Names </h3>
+<hr/>
+<div ng-repeat="nm in patient.name">
+  <span class="muted-text">{{nm.use}}</span> :
+  <span>{{nm.prefix}}</span>
+  <span>{{nm.given.join(' ')}}</span>
+  <b>{{nm.family.join(' ')}}</b>
+  <span>{{nm.sufix}}</span>
+</div>
+
+<h3> Address </h3>
+<hr/>
+
+<div ng-repeat="ad in patient.address">
+  <span class="muted-text">{{ad.use}}</span> :
+  <span>{{ad.line.join(' ')}}</span>,
+  <span>{{ad.city}}</span>,
+  <span>{{ad.state}}</span>,
+  <span>{{ad.zip}}</span>
+</div>
+
+<h3> Telecom </h3>
+<hr/>
+
+<div ng-repeat="ad in patient.telecom">
+  <span class="muted-text">{{ad.use}}</span>
+  <span>{{ad.system}}</span>:
+  <span>{{ad.value}}</span>
+</div>
+
+<h3> Contacts </h3>
+<hr/>
+
+<div ng-repeat="ad in patient.contact">
+  <span class="muted-text">{{ad.relationship[0].coding[0].code}}</span> :
+  <span>{{ad.name | humanName}}</span>,
+  <span ng-repeat="tel in ad.telecom">
+    <span class="muted-text">{{tel.use}}</span>
+    <span>{{tel.system}}</span>:
+    <span>{{tel.value}}</span>
+  </span>
+</div>
+
+<!-- <code><pre> {{ patient | json}} </pre></code> -->
