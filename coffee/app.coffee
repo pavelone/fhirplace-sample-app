@@ -35,15 +35,22 @@ mapResources = (atom)->
 
 identity = (i)-> i
 
-humanName = (nm)->
-  if angular.isArray(nm)
-    nm.map(humanName).join('; ')
-  else
-    [nm.family && nm.family.join(' '), nm.given && nm.given.join(' ')]
-      .filter(identity)
-      .join(', ')
+mkFilter = (fn)->
+  ()->
+    (inp)->
+      if angular.isArray(inp)
+        inp.map(fn).join('; ')
+      else if inp
+        fn(inp)
+      else
+        ''
 
-app.filter 'humanName', ()-> humanName
+humanName = (nm)->
+  [nm.family && nm.family.join(' '), nm.given && nm.given.join(' ')]
+    .filter(identity)
+    .join(', ')
+
+app.filter 'humanName', mkFilter(humanName)
 
 MRN_SYSTEM = 'urn:oid:1.2.36.146.595.217.0.1'
 
@@ -54,23 +61,20 @@ medicalRecordNumber = (identifiers)->
 app.filter 'mrn', ()-> medicalRecordNumber
 
 formatAddress = (ad)->
-  if angular.isArray(nm)
-    nm.map(formatAddress).join('; ')
-  else
-    [ad.use,
-    ad.line.join(' '),
-    ad.city,
-    ad.state,
-    ad.zip].filter(identity).join('; ')
+  [ad.use,
+  ad.line.join(' '),
+  ad.city,
+  ad.state,
+  ad.zip].filter(identity).join('; ')
 
-app.filter 'address', ()-> formatAddress
+app.filter 'address', mkFilter(formatAddress)
 
 
 age = (date)->
   ms = new Date() - new Date(date)
   "#{Math.round(ms/(1000*60*60*24*365))} y"
 
-app.filter 'age', ()-> age
+app.filter 'age', mkFilter(age)
 
 app.run ($rootScope)->
   $rootScope.menu = menu()
