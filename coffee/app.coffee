@@ -133,7 +133,7 @@ app.controller 'PatientNewCtrl', ($rootScope, $scope, $routeParams, $http, $loca
     $scope.entity.name.push({})
 
   $scope.removeName = (name)->
-    return if $scope.entity.names.length < 2
+    return if $scope.entity.name.length < 2
     $scope.entity.names = $scope.entity.names.filter((i)-> i != name )
 
   $scope.register = ()->
