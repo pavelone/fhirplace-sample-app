@@ -1,5 +1,7 @@
 <div class="well">
-  <input class="form-control search" />
+  <form ng-submit="search()">
+    <input class="form-control search" ng-model="query" />
+  </form>
 </div>
 
 <table class="table table-compact">

@@ -23,7 +23,7 @@ app = angular.module 'regi', [
       .otherwise
         redirectTo: '/'
 
-defaultMenu = [{url: '/patients', label: 'Patient'},
+defaultMenu = [{url: '/patients', label: 'Patients'},
                {url: "/patients/new", label: "Register", icon: "fa-plus"}]
 
 menu = (args...)->
@@ -31,10 +31,10 @@ menu = (args...)->
 
 
 mapResources = (atom)->
-  atom.entry.map (i)->
-   res = i.content
-   res._id = i.id
-   res
+  (atom.entry || []).map (i)->
+     res = i.content
+     res._id = i.id
+     res
 
 identity = (i)-> i
 
@@ -98,9 +98,20 @@ app.run ($rootScope)->
 app.controller 'PatientsIndexCtrl', ($rootScope, $scope, $routeParams, $http) ->
   $rootScope.menu = angular.copy(defaultMenu)
   $rootScope.menu[0].active = true
-  $rootScope.progress = $http.get("/Patient/_search?_format=application/json")
-    .success (data, status, headers, config)->
-      $scope.patients = mapResources(data)
+
+  search = (inp)->
+    params = {}
+    params.name = inp if inp?
+    console.log(params)
+    $rootScope.progress = $http.get("/Patient/_search?_format=application/json", {params: params})
+      .success (data, status, headers, config)->
+        $scope.patients = mapResources(data)
+
+  $scope.search = ()->
+    if $scope.query?
+      search($scope.query)
+
+  search()
 
 app.controller 'PatientShowCtrl', ($rootScope, $scope, $routeParams, $http) ->
   $rootScope.menu = angular.copy(defaultMenu)
