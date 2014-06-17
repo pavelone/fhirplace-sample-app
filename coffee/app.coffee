@@ -134,7 +134,7 @@ app.controller 'PatientNewCtrl', ($rootScope, $scope, $routeParams, $http, $loca
 
   $scope.removeName = (name)->
     return if $scope.entity.name.length < 2
-    $scope.entity.names = $scope.entity.names.filter((i)-> i != name )
+    $scope.entity.name = $scope.entity.name.filter((i)-> i != name )
 
   $scope.register = ()->
     $rootScope.progress = $http.post('/Patient/', $scope.entity)
