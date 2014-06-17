@@ -5,7 +5,8 @@ app = angular.module 'regi', [
   'ngAnimate',
   'ngSanitize',
   'formstamp',
-  'ngRoute'
+  'ngRoute',
+  'ngFileReader'
 ], ($routeProvider) ->
     $routeProvider
       .when '/',
@@ -76,23 +77,21 @@ age = (date)->
 
 app.filter 'age', mkFilter(age)
 
+dataUrl = (attach)->
+  return unless attach
+  "data:#{attach.contentType};base64,#{attach.data}"
+
+app.filter 'dataUrl', mkFilter(dataUrl)
+
 app.run ($rootScope)->
   $rootScope.menu = menu()
   $rootScope.$watch 'progress', (v)->
     return unless v && v.success
-    delete $rootScope.error
     $rootScope.loading = 'Loading'
-    $rootScope.progressCls = 'prgrss'
     v.success (vv, status, _, req)->
-       $rootScope.loading = null
-       $rootScope.success = "#{new Date()} - #{req.method} #{req.url}"
-       delete $rootScope.progressCls
-       console.log('progress success', req)
+       delete $rootScope.loading
      .error (vv, status, _, req)->
-       $rootScope.loading = null
-       $rootScope.error = vv || "Server error #{status} while loading:  #{req.url}"
-       console.log('progress error', arguments)
-       delete $rootScope.progressCls
+       delete $rootScope.loading
 
 app.controller 'PatientsIndexCtrl', ($rootScope, $scope, $routeParams, $http) ->
   $rootScope.progress = $http.get("/Patient/_search?_format=application/json")
@@ -114,29 +113,55 @@ baseMrn = {
   "assigner": { "display": "FHIRPlace" }
 }
 
-app.controller 'PatientNewCtrl', ($rootScope, $scope, $routeParams, $http, $location) ->
-  $scope.names = []
-  $scope.nameUses = ["official", "usual"]
-  $scope.genders = [
+gendersVS = [
      {system: "http://hl7.org/fhir/v3/AdministrativeGender", code: "M", display: "Male" },
      {system: "http://hl7.org/fhir/v3/AdministrativeGender", code: "F", display: "Female" }]
        .map (i)-> {coding: [i], text: i.display}
 
+telecomSystems = [ 'phone', 'fax', 'email', 'url']
+telecomUses = ['home','work','temp','old','mobile']
+
+
+dataUrlToBase64 = (str)->
+  str.split(';base64,')[1]
+
+
+app.controller 'PatientNewCtrl', ($rootScope, $scope, $routeParams, $http, $location) ->
+  $scope.names = []
+  $scope.nameUses = ["official", "usual"]
+  $scope.genders = gendersVS
+
+  $scope.telecomSystems = telecomSystems
+  $scope.telecomUses = telecomUses
 
   $scope.entity = {
     resourceType: "Patient",
     birthDate: '1974-01-01',
+    active: true,
+    telecom: [],
+    address: [],
     name: [{use: 'official', given: ['Doctor'], family: ['Ajbolit']}],
     identifier: [angular.copy(baseMrn)]}
 
-  $scope.addName = ()->
-    $scope.entity.name.push({})
+  $scope.addMultiAttr = (prop)-> ($scope.entity[prop] ||= []).push({})
 
-  $scope.removeName = (name)->
-    return if $scope.entity.name.length < 2
-    $scope.entity.name = $scope.entity.name.filter((i)-> i != name )
+  $scope.removeMultiAttr = (prop, item, oneRequired)->
+    ptitem = $scope.entity[prop]
+    return if oneRequired && ptitem.length < 2
+    $scope.entity[prop] = ptitem.filter((i)-> i != item )
 
   $scope.register = ()->
     $rootScope.progress = $http.post('/Patient/', $scope.entity)
       .success (data, status, headers, config) ->
         $location.path("/patients/")
+
+  $scope.readMethod = "readAsDataURL"
+
+  $scope.onPhotoReaded = (e, file)->
+    console.log(e.target)
+    console.log(file)
+    $scope.photo = e.target.result
+    $scope.entity.photo = [{
+      contentType: file.type,
+      data: dataUrlToBase64(e.target.result)
+    }]

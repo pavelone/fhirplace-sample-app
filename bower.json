@@ -11,6 +11,7 @@
     "angular-route": "latest",
     "angular-formstamp": "latest",
     "angular-animate": "latest",
+    "ngFileReader": "latest",
     "components-font-awesome": "latest"
   }
 }

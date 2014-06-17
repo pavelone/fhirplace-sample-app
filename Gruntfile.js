@@ -57,6 +57,9 @@ module.exports = function (grunt) {
           "lib/angular-formstamp/build/formstamp.js",
           "lib/angular-route/angular-route.js",
           "lib/angular-animate/angular-animate.js",
+          "lib/ngFileReader/vendor/swfobject.js",
+          "lib/ngFileReader/vendor/jquery.FileReader.js",
+          "lib/ngFileReader/src/ngFileReader.js",
           "lib/angular-cookies/angular-cookies.js",
           "lib/angular-sanitize/angular-sanitize.js",
           "lib/angular-formstamp/build/formstamp.js"
@@ -82,6 +85,12 @@ module.exports = function (grunt) {
         expand: true,
         src: '*',
         dest: app_prefix + 'fonts/'
+      },
+      swf: {
+        cwd: 'lib/ngFileReader/vendor/',
+        expand: true,
+        src: '*',
+        dest: app_prefix + 'swf/'
       },
       fa_fonts: {
         cwd: 'lib/components-font-awesome/fonts/',
