@@ -1,0 +1,140 @@
+<div class="row">
+  <div class="col-xs-5">
+    <fs-form-for model="entity">
+    <fieldset>
+      <legend>Patient Info</legend>
+      <fs-input as="text"
+      name="identifier[0].value"
+      label="MRN"></fs-input>
+
+      <fs-input as="fs-select"
+      name="gender"
+      items="genders"
+      freetext="true"
+      label="Gender">{{ item.text }}</fs-input>
+
+      <div class="form-group">
+        <label class="col-sm-2 control-label">Photo</label>
+        <div class="col-sm-10">
+          <img ng-src="{{entity.photo | dataUrl}}" alt="" style="width: 100px;" />
+          <div ng-file-reader on-readed="onPhotoReaded(event,file)"
+            read-method="readMethod"
+            filereader="swf/filereader.swf"
+            multiple debug-mode="true"></div>
+        </div>
+      </div>
+
+
+      <fs-input as="text" name="birthDate" label="Birth Date"></fs-input>
+    </fieldset>
+    </fs-form-for>
+
+  </div>
+  <div class="col-xs-5 col-xs-offset-1">
+    <fieldset class="form-horizontal first-level">
+      <legend>Names </legend>
+      <div  ng-repeat="nm in entity.name">
+        <fs-form-for model="nm">
+
+        <fs-input as="fs-select"
+        name="use"
+        items="nameUses"
+        freetext="true"
+        label="Use">{{ item }}</fs-input>
+
+        <fs-input as="fs-multiselect"
+        name="family"
+        items="names"
+        freetext="true"
+        label="Famliy">{{ item }}</fs-input>
+
+        <fs-input as="fs-multiselect"
+        name="given"
+        items="names"
+        freetext="true"
+        label="Given">{{ item }}</fs-input>
+        <div class="row">
+          <div class="btn-group pull-right">
+            <a class="btn btn-default" ng-click="removeMultiAttr('name', nm, true)">Remove name</a>
+            <a class="btn btn-default" ng-click="addMultiAttr('name')">Add name</a>
+          </div>
+        </div>
+        <hr/>
+        </fs-form-for>
+      </div>
+    </fieldset>
+  </div>
+</div>
+
+
+<div class="row">
+  <div class="col-xs-5">
+    <fieldset class="form-horizontal first-level">
+      <legend>Telecom</legend>
+      <div class="row">
+        <div class="btn-group pull-right">
+          <a class="btn btn-default" ng-show="entity.telecom.length < 1"  ng-click="addMultiAttr('telecom')">Add telecom</a>
+        </div>
+      </div>
+      <div  ng-repeat="tl in entity.telecom">
+        <fs-form-for model="tl">
+
+        <fs-input as="fs-select"
+        name="system"
+        items="telecomSystems"
+        label="System">{{ item }}</fs-input>
+
+        <fs-input as="fs-select"
+        name="use"
+        items="telecomUses"
+        label="System">{{ item }}</fs-input>
+
+        <fs-input as="text" name="value" freetext="true" label="Telecom"></fs-input>
+
+        <div class="row">
+          <div class="btn-group pull-right">
+            <a class="btn btn-default" ng-click="removeMultiAttr('telecom', tl)">Remove telecom</a>
+            <a class="btn btn-default" ng-click="addMultiAttr('telecom')">Add telecom</a>
+          </div>
+        </div>
+        <hr/>
+        </fs-form-for>
+      </div>
+    </fieldset>
+  </div>
+  <div class="col-xs-5 col-xs-offset-1">
+
+    <fieldset class="form-horizontal first-level">
+      <legend>Address</legend>
+      <div class="row">
+        <div class="btn-group pull-right">
+          <a class="btn btn-default" ng-show="entity.address.length < 1"  ng-click="addMultiAttr('address')">Add address</a>
+        </div>
+      </div>
+      <div  ng-repeat="ad in entity.address">
+        <fs-form-for model="ad">
+
+        <fs-input as="fs-select"
+        name="use"
+        items="addressUses"
+        label="System">{{ item }}</fs-input>
+
+        <fs-input as="fs-multiselect" freetext="true" items="emptyItems" name="line"  label="Line"></fs-input>
+        <fs-input as="text" name="city"  label="City"></fs-input>
+        <fs-input as="text" name="state" label="State"></fs-input>
+        <fs-input as="text" name="zip"   label="ZIP"></fs-input>
+        <fs-input as="text" name="country" label="Country"></fs-input>
+
+        <div class="row">
+          <div class="btn-group pull-right">
+            <a class="btn btn-default" ng-click="removeMultiAttr('address', ad)">Remove address</a>
+            <a class="btn btn-default" ng-click="addMultiAttr('address')">Add address</a>
+          </div>
+        </div>
+        <hr/>
+        </fs-form-for>
+      </div>
+    </fieldset>
+  </div>
+</div>
+

@@ -10,7 +10,8 @@ app = angular.module 'regi', [
 ], ($routeProvider) ->
     $routeProvider
       .when '/',
-        templateUrl: '/views/welcome.html'
+        templateUrl: '/views/patients/index.html'
+        controller: 'PatientsIndexCtrl'
       .when '/patients',
         templateUrl: '/views/patients/index.html'
         controller: 'PatientsIndexCtrl'
@@ -20,6 +21,9 @@ app = angular.module 'regi', [
       .when '/patients/:id',
         templateUrl: '/views/patients/show.html'
         controller: 'PatientShowCtrl'
+      .when '/patients/:id/edit',
+        templateUrl: '/views/patients/edit.html'
+        controller: 'PatientEditCtrl'
       .otherwise
         redirectTo: '/'
 
@@ -85,15 +89,37 @@ dataUrl = (attach)->
 
 app.filter 'dataUrl', mkFilter(dataUrl)
 
+gendersVS = [
+     {system: "http://hl7.org/fhir/v3/AdministrativeGender", code: "M", display: "Male" },
+     {system: "http://hl7.org/fhir/v3/AdministrativeGender", code: "F", display: "Female" }]
+       .map (i)-> {coding: [i], text: i.display}
+
+telecomSystems = [ 'phone', 'fax', 'email', 'url']
+telecomUses = ['home','work','temp','old','mobile']
+
+addressUses = ['home','work','temp','old']
+
 app.run ($rootScope)->
   $rootScope.menu = menu()
   $rootScope.$watch 'progress', (v)->
     return unless v && v.success
     $rootScope.loading = 'Loading'
+    delete $rootScope.error
     v.success (vv, status, _, req)->
        delete $rootScope.loading
      .error (vv, status, _, req)->
+       console.error(arguments)
+       $rootScope.error = vv || "Server error #{status} while loading:  #{req.url}"
        delete $rootScope.loading
+
+  $rootScope.names = []
+  $rootScope.emptyItems = []
+  $rootScope.nameUses = ["official", "usual"]
+  $rootScope.genders = gendersVS
+
+  $rootScope.telecomSystems = telecomSystems
+  $rootScope.telecomUses = telecomUses
+  $rootScope.addressUses = addressUses
 
 app.controller 'PatientsIndexCtrl', ($rootScope, $scope, $routeParams, $http) ->
   $rootScope.menu = angular.copy(defaultMenu)
@@ -118,7 +144,10 @@ app.controller 'PatientShowCtrl', ($rootScope, $scope, $routeParams, $http) ->
   menuItem = $rootScope.menu[1]
   menuItem.label = $routeParams.id
   menuItem.icon = null
-  menuItem.href = ''
+  menuItem.url = "/patients/#{$routeParams.id}"
+
+  $rootScope.menu.push({icon: 'fa-edit', url:  "/patients/#{$routeParams.id}/edit", label: 'edit'})
+
   url = "/Patient/#{$routeParams.id}?_format=application/json"
   $rootScope.progress = $http.get(url)
     .success (data, status, headers, config)->
@@ -133,43 +162,12 @@ baseMrn = {
   "assigner": { "display": "FHIRPlace" }
 }
 
-gendersVS = [
-     {system: "http://hl7.org/fhir/v3/AdministrativeGender", code: "M", display: "Male" },
-     {system: "http://hl7.org/fhir/v3/AdministrativeGender", code: "F", display: "Female" }]
-       .map (i)-> {coding: [i], text: i.display}
-
-telecomSystems = [ 'phone', 'fax', 'email', 'url']
-telecomUses = ['home','work','temp','old','mobile']
-
-addressUses = ['home','work','temp','old']
 
 
 dataUrlToBase64 = (str)->
   str.split(';base64,')[1]
 
-
-app.controller 'PatientNewCtrl', ($rootScope, $scope, $routeParams, $http, $location) ->
-  $rootScope.menu = angular.copy(defaultMenu)
-  $rootScope.menu[1].active = true
-
-  $scope.names = []
-  $scope.emptyItems = []
-  $scope.nameUses = ["official", "usual"]
-  $scope.genders = gendersVS
-
-  $scope.telecomSystems = telecomSystems
-  $scope.telecomUses = telecomUses
-  $scope.addressUses = addressUses
-
-  $scope.entity = {
-    resourceType: "Patient",
-    birthDate: '1974-01-01',
-    active: true,
-    telecom: [],
-    address: [],
-    name: [{use: 'official', given: ['Doctor'], family: ['Ajbolit']}],
-    identifier: [angular.copy(baseMrn)]}
-
+commonForm = ($scope)->
   $scope.addMultiAttr = (prop)-> ($scope.entity[prop] ||= []).push({})
 
   $scope.removeMultiAttr = (prop, item, oneRequired)->
@@ -177,16 +175,58 @@ app.controller 'PatientNewCtrl', ($rootScope, $scope, $routeParams, $http, $loca
     return if oneRequired && ptitem.length < 2
     $scope.entity[prop] = ptitem.filter((i)-> i != item )
 
+  $scope.readMethod = "readAsDataURL"
+
+  $scope.onPhotoReaded = (e, file)->
+    $scope.photo = e.target.result
+    $scope.entity.photo = [{ contentType: file.type, data: dataUrlToBase64(e.target.result) }]
+
+app.controller 'PatientNewCtrl', ($rootScope, $scope, $routeParams, $http, $location) ->
+  $rootScope.menu = angular.copy(defaultMenu)
+  $rootScope.menu[1].active = true
+
+  $scope.entity = {
+    resourceType: "Patient",
+    birthDate: '1974-01-01',
+    active: true,
+    telecom: [],
+    address: [],
+    name: [{use: 'official', given: [], family: []}],
+    identifier: [angular.copy(baseMrn)]}
+
+  commonForm($scope)
+
   $scope.register = ()->
     $rootScope.progress = $http.post('/Patient/', $scope.entity)
       .success (data, status, headers, config) ->
         $location.path("/patients/")
 
-  $scope.readMethod = "readAsDataURL"
 
-  $scope.onPhotoReaded = (e, file)->
-    $scope.photo = e.target.result
-    $scope.entity.photo = [{
-      contentType: file.type,
-      data: dataUrlToBase64(e.target.result)
-    }]
+app.controller 'PatientEditCtrl', ($rootScope, $location, $scope, $routeParams, $http) ->
+  $rootScope.menu = angular.copy(defaultMenu)
+  menuItem = $rootScope.menu[1]
+  ptId = $routeParams.id
+  menuItem.label = ptId
+  menuItem.icon = null
+  menuItem.url = "/patients/#{ptId}"
+
+  $scope.ptId = ptId
+
+  $rootScope.menu.push({active: true, icon: 'fa-edit', url:  "/patients/#{ptId}/edit", label: 'edit'})
+
+  ptUrl = "/Patient/#{ptId}?_format=application/json"
+
+  $rootScope.progress = $http.get(ptUrl)
+    .success (data, status, headers, config)->
+      $scope.ptVersion = headers('Content-Location')
+      data.telecom ||= []
+      data.address ||= []
+      $scope.entity = data
+
+  commonForm($scope)
+
+  $scope.update = ()->
+    headers = {headers: {'Content-Location': $scope.ptVersion}}
+    $rootScope.progress = $http.put(ptUrl, $scope.entity, headers)
+      .success (data, status, headers, config) ->
+        $location.path("/patients/#{ptId}")

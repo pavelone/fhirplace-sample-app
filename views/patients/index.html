@@ -1,6 +1,6 @@
 <div class="well">
   <form ng-submit="search()">
-    <input class="form-control search" ng-model="query" />
+    <input class="form-control search" ng-model="query" placeholder="Search by name or mrn"/>
   </form>
 </div>
 
@@ -15,7 +15,7 @@
   </thead>
   <tr ng-repeat="pt in patients">
     <td>
-      <img ng-src="{{pt.photo | dataUrl}}" class="person-photo small"/>
+      <img alt="photo" ng-src="{{pt.photo | dataUrl}}" class="person-photo small"/>
       <a href="#/patients/{{pt._id}}"> {{pt.name | humanName }}</a>
     </td>
     <td> {{pt.gender.coding[0].display }} </td>
