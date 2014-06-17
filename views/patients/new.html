@@ -1,10 +1,5 @@
-<h1> Register new patient </h1>
-<hr/>
-
 <div class="row">
-
-
-  <div class="col-xs-6">
+  <div class="col-xs-5">
     <fs-form-for model="entity">
     <fieldset>
       <legend>Patient Info</legend>
@@ -34,6 +29,8 @@
     </fieldset>
     </fs-form-for>
 
+  </div>
+  <div class="col-xs-5 col-xs-offset-1">
     <fieldset class="form-horizontal first-level">
       <legend>Names </legend>
       <div  ng-repeat="nm in entity.name">
@@ -67,8 +64,11 @@
       </div>
     </fieldset>
   </div>
-  <div class="col-xs-6">
+</div>
 
+
+<div class="row">
+  <div class="col-xs-5">
     <fieldset class="form-horizontal first-level">
       <legend>Telecom</legend>
       <div class="row">
@@ -101,6 +101,8 @@
         </fs-form-for>
       </div>
     </fieldset>
+  </div>
+  <div class="col-xs-5 col-xs-offset-1">
 
     <fieldset class="form-horizontal first-level">
       <legend>Address</legend>
@@ -113,11 +115,15 @@
         <fs-form-for model="ad">
 
         <fs-input as="fs-select"
-        name="system"
-        items="addressSystems"
+        name="use"
+        items="addressUses"
         label="System">{{ item }}</fs-input>
 
-        <fs-input as="text" name="value" freetext="true" label="address"></fs-input>
+        <fs-input as="fs-multiselect" freetext="true" items="emptyItems" name="line"  label="Line"></fs-input>
+        <fs-input as="text" name="city"  label="City"></fs-input>
+        <fs-input as="text" name="state" label="State"></fs-input>
+        <fs-input as="text" name="zip"   label="ZIP"></fs-input>
+        <fs-input as="text" name="country" label="Country"></fs-input>
 
         <div class="row">
           <div class="btn-group pull-right">
@@ -129,44 +135,13 @@
         </fs-form-for>
       </div>
     </fieldset>
-    <fieldset class="form-horizontal first-level">
-      <legend>Telecom</legend>
-      <div class="row">
-        <div class="btn-group pull-right">
-          <a class="btn btn-default" ng-show="entity.telecom.length < 1"  ng-click="addMultiAttr('telecom')">Add telecom</a>
-        </div>
-      </div>
-      <div  ng-repeat="tl in entity.telecom">
-        <fs-form-for model="tl">
-
-        <fs-input as="fs-select"
-        name="system"
-        items="telecomSystems"
-        label="System">{{ item }}</fs-input>
-
-        <fs-input as="fs-select"
-        name="use"
-        items="telecomUses"
-        label="System">{{ item }}</fs-input>
-
-        <fs-input as="text" name="value" freetext="true" label="Telecom"></fs-input>
-
-        <div class="row">
-          <div class="btn-group pull-right">
-            <a class="btn btn-default" ng-click="removeMultiAttr('telecom', tl)">Remove telecom</a>
-            <a class="btn btn-default" ng-click="addMultiAttr('telecom')">Add telecom</a>
-          </div>
-        </div>
-        <hr/>
-        </fs-form-for>
-      </div>
-    </fieldset>
-
-
-    <hr/>
-    <a class="btn btn-success" ng-click="register()">Register</a>
-    <a class="btn btn-default" href="#/patients">cancel</a>
-
-    <pre>{{entity | json}}</pre>
   </div>
+</div>
+
+<h3>FHIR resource</h3>
+<pre>{{entity | json}}</pre>
+
+<div class="btns">
+  <a class="btn btn-success" ng-click="register()">Register</a>
+  <a class="btn btn-default" href="#/patients">cancel</a>
 </div>

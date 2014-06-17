@@ -1,7 +1,5 @@
 <div class="well">
-  <h2> Patients
-    <a href="#/patients/new" class="btn btn-success">Register</a>
-  </h2>
+  <input class="form-control search" />
 </div>
 
 <table class="table table-compact">
@@ -14,8 +12,10 @@
     </tr>
   </thead>
   <tr ng-repeat="pt in patients">
-    <td> <img src="{{pt.photo | dataUrl}}" style="width:50px;"/> </td>
-    <td> <a href="#/patients/{{pt._id}}"> {{pt.name | humanName }}</a></td>
+    <td>
+      <img ng-src="{{pt.photo | dataUrl}}" class="person-photo small"/>
+      <a href="#/patients/{{pt._id}}"> {{pt.name | humanName }}</a>
+    </td>
     <td> {{pt.gender.coding[0].display }} </td>
     <td> {{pt.birthDate | age}} / {{pt.birthDate}}</td>
     <td> {{pt.identifier | mrn}}</td>

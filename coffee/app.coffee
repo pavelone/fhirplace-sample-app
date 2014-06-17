@@ -23,7 +23,9 @@ app = angular.module 'regi', [
       .otherwise
         redirectTo: '/'
 
-defaultMenu = [{url: '/patients', label: 'Patient'}]
+defaultMenu = [{url: '/patients', label: 'Patient'},
+               {url: "/patients/new", label: "Register", icon: "fa-plus"}]
+
 menu = (args...)->
   defaultMenu.slice(0).concat(args)
 
@@ -94,11 +96,18 @@ app.run ($rootScope)->
        delete $rootScope.loading
 
 app.controller 'PatientsIndexCtrl', ($rootScope, $scope, $routeParams, $http) ->
+  $rootScope.menu = angular.copy(defaultMenu)
+  $rootScope.menu[0].active = true
   $rootScope.progress = $http.get("/Patient/_search?_format=application/json")
     .success (data, status, headers, config)->
       $scope.patients = mapResources(data)
 
 app.controller 'PatientShowCtrl', ($rootScope, $scope, $routeParams, $http) ->
+  $rootScope.menu = angular.copy(defaultMenu)
+  menuItem = $rootScope.menu[1]
+  menuItem.label = $routeParams.id
+  menuItem.icon = null
+  menuItem.href = ''
   url = "/Patient/#{$routeParams.id}?_format=application/json"
   $rootScope.progress = $http.get(url)
     .success (data, status, headers, config)->
@@ -121,18 +130,25 @@ gendersVS = [
 telecomSystems = [ 'phone', 'fax', 'email', 'url']
 telecomUses = ['home','work','temp','old','mobile']
 
+addressUses = ['home','work','temp','old']
+
 
 dataUrlToBase64 = (str)->
   str.split(';base64,')[1]
 
 
 app.controller 'PatientNewCtrl', ($rootScope, $scope, $routeParams, $http, $location) ->
+  $rootScope.menu = angular.copy(defaultMenu)
+  $rootScope.menu[1].active = true
+
   $scope.names = []
+  $scope.emptyItems = []
   $scope.nameUses = ["official", "usual"]
   $scope.genders = gendersVS
 
   $scope.telecomSystems = telecomSystems
   $scope.telecomUses = telecomUses
+  $scope.addressUses = addressUses
 
   $scope.entity = {
     resourceType: "Patient",
@@ -158,8 +174,6 @@ app.controller 'PatientNewCtrl', ($rootScope, $scope, $routeParams, $http, $loca
   $scope.readMethod = "readAsDataURL"
 
   $scope.onPhotoReaded = (e, file)->
-    console.log(e.target)
-    console.log(file)
     $scope.photo = e.target.result
     $scope.entity.photo = [{
       contentType: file.type,
