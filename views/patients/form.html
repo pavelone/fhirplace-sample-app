@@ -36,11 +36,7 @@
       <div  ng-repeat="nm in entity.name">
         <fs-form-for model="nm">
 
-        <fs-input as="fs-select"
-        name="use"
-        items="nameUses"
-        freetext="true"
-        label="Use">{{ item }}</fs-input>
+        <fs-input as="fs-select" name="use" items="nameUses" freetext="true" label="Use">~{{item}}</fs-input>
 
         <fs-input as="fs-multiselect"
         name="family"
