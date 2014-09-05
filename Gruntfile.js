@@ -62,7 +62,8 @@ module.exports = function (grunt) {
           "lib/ngFileReader/src/ngFileReader.js",
           "lib/angular-cookies/angular-cookies.js",
           "lib/angular-sanitize/angular-sanitize.js",
-          "lib/angular-formstamp/build/formstamp.js"
+          "lib/angular-formstamp/build/formstamp.js",
+          "lib/fhir.js/dist/ngFhir.js"
         ],
         dest: app_prefix + 'lib.js'
       },
@@ -74,7 +75,7 @@ module.exports = function (grunt) {
         src: ['lib/components-font-awesome/css/font-awesome.min.css',
         'lib/angular-formstamp/build/formstamp.css',
         'lib/bootstrap/dist/css/bootstrap.min.css',
-        "lib/angular-formstamp/build/formstamp.css",
+        "lib/angular-formstamp/build/formstamp.css"
         ],
         dest: app_prefix + 'css/lib.css'
       }

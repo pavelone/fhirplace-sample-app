@@ -12,6 +12,7 @@
     "angular-formstamp": "latest",
     "angular-animate": "1.2.6",
     "ngFileReader": "latest",
-    "components-font-awesome": "latest"
+    "components-font-awesome": "latest",
+    "fhir.js": "fhir/fhir.js"
   }
 }

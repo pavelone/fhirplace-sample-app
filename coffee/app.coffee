@@ -6,7 +6,8 @@ app = angular.module 'regi', [
   'ngSanitize',
   'formstamp',
   'ngRoute',
-  'ngFileReader'
+  'ngFileReader',
+  'ng-fhir'
 ], ($routeProvider) ->
     $routeProvider
       .when '/',
@@ -27,12 +28,14 @@ app = angular.module 'regi', [
       .otherwise
         redirectTo: '/'
 
+app.config ($fhirProvider)->
+  $fhirProvider.baseUrl = ''#http://try-fhirplace.hospital-systems.com'
+
 defaultMenu = [{url: '/patients', label: 'Patients'},
                {url: "/patients/new", label: "Register", icon: "fa-plus"}]
 
 menu = (args...)->
   defaultMenu.slice(0).concat(args)
-
 
 mapResources = (atom)->
   (atom.entry || []).map (i)->
@@ -75,7 +78,6 @@ formatAddress = (ad)->
   ad.zip].filter(identity).join('; ')
 
 app.filter 'address', mkFilter(formatAddress)
-
 
 age = (date)->
   ms = new Date() - new Date(date)
@@ -121,17 +123,15 @@ app.run ($rootScope)->
   $rootScope.telecomUses = telecomUses
   $rootScope.addressUses = addressUses
 
-app.controller 'PatientsIndexCtrl', ($rootScope, $scope, $routeParams, $http) ->
+app.controller 'PatientsIndexCtrl', ($rootScope, $scope, $routeParams, $fhir) ->
   $rootScope.menu = angular.copy(defaultMenu)
   $rootScope.menu[0].active = true
 
   search = (inp)->
     params = {}
     params.name = inp if inp?
-    console.log(params)
-    $rootScope.progress = $http.get("/Patient/_search?_format=application/json", {params: params})
-      .success (data, status, headers, config)->
-        $scope.patients = mapResources(data)
+    $rootScope.progress = $fhir.search 'Patient', params, (data)->
+      $scope.patients = mapResources(data)
 
   $scope.search = ()->
     if $scope.query?
@@ -139,7 +139,7 @@ app.controller 'PatientsIndexCtrl', ($rootScope, $scope, $routeParams, $http) ->
 
   search()
 
-app.controller 'PatientShowCtrl', ($rootScope, $scope, $routeParams, $http) ->
+app.controller 'PatientShowCtrl', ($rootScope, $scope, $routeParams, $fhir) ->
   $rootScope.menu = angular.copy(defaultMenu)
   menuItem = $rootScope.menu[1]
   menuItem.label = $routeParams.id
@@ -149,9 +149,8 @@ app.controller 'PatientShowCtrl', ($rootScope, $scope, $routeParams, $http) ->
   $rootScope.menu.push({icon: 'fa-edit', url:  "/patients/#{$routeParams.id}/edit", label: 'edit'})
 
   url = "/Patient/#{$routeParams.id}?_format=application/json"
-  $rootScope.progress = $http.get(url)
-    .success (data, status, headers, config)->
-      $scope.patient = data
+  $rootScope.progress = $fhir.read url, (data)->
+    $scope.patient = data.content
 
 baseMrn = {
   "use": "usual",
@@ -161,8 +160,6 @@ baseMrn = {
   "period": { "start": new Date() },
   "assigner": { "display": "FHIRPlace" }
 }
-
-
 
 dataUrlToBase64 = (str)->
   str.split(';base64,')[1]
@@ -181,7 +178,7 @@ commonForm = ($scope)->
     $scope.photo = e.target.result
     $scope.entity.photo = [{ contentType: file.type, data: dataUrlToBase64(e.target.result) }]
 
-app.controller 'PatientNewCtrl', ($rootScope, $scope, $routeParams, $http, $location) ->
+app.controller 'PatientNewCtrl', ($rootScope, $scope, $routeParams, $fhir, $location) ->
   $rootScope.menu = angular.copy(defaultMenu)
   $rootScope.menu[1].active = true
 
@@ -197,12 +194,11 @@ app.controller 'PatientNewCtrl', ($rootScope, $scope, $routeParams, $http, $loca
   commonForm($scope)
 
   $scope.register = ()->
-    $rootScope.progress = $http.post('/Patient/', $scope.entity)
-      .success (data, status, headers, config) ->
-        $location.path("/patients/")
+    content = {content: $scope.entity}
+    $rootScope.progress = $fhir.create content, (data)->
+      $location.path("/patients/")
 
-
-app.controller 'PatientEditCtrl', ($rootScope, $location, $scope, $routeParams, $http) ->
+app.controller 'PatientEditCtrl', ($rootScope, $location, $scope, $routeParams, $fhir) ->
   $rootScope.menu = angular.copy(defaultMenu)
   menuItem = $rootScope.menu[1]
   ptId = $routeParams.id
@@ -216,17 +212,15 @@ app.controller 'PatientEditCtrl', ($rootScope, $location, $scope, $routeParams, 
 
   ptUrl = "/Patient/#{ptId}?_format=application/json"
 
-  $rootScope.progress = $http.get(ptUrl)
-    .success (data, status, headers, config)->
-      $scope.ptVersion = headers('Content-Location')
-      data.telecom ||= []
-      data.address ||= []
-      $scope.entity = data
+  $rootScope.progress = $fhir.read ptUrl, (data)->
+    $scope.ptVersion = data.id
+    data.content.telecom ||= []
+    data.content.address ||= []
+    $scope.entity = data.content
 
   commonForm($scope)
 
   $scope.update = ()->
-    headers = {headers: {'Content-Location': $scope.ptVersion}}
-    $rootScope.progress = $http.put(ptUrl, $scope.entity, headers)
-      .success (data, status, headers, config) ->
-        $location.path("/patients/#{ptId}")
+    content = {content: $scope.entity, id: $scope.ptVersion}
+    $rootScope.progress = $fhir.update content, (data)->
+      $location.path("/patients/#{ptId}")
