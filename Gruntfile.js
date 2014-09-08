@@ -10,7 +10,7 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks('grunt-contrib-connect');
 
   var app_name = 'regi'
-  var app_prefix = '../fhirplace/resources/public/' + app_name + '/';
+  var app_prefix = process.env.PREFIX + '/' || '../fhirplace/resources/public/' + app_name + '/';
 
   var main_js = app_prefix + 'main.js';
 

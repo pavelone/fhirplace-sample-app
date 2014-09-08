@@ -28,8 +28,9 @@ app = angular.module 'regi', [
       .otherwise
         redirectTo: '/'
 
-app.config ($fhirProvider)->
-  $fhirProvider.baseUrl = ''#http://try-fhirplace.hospital-systems.com'
+BASE_URL = 'http://try-fhirplace.hospital-systems.com'
+
+app.config ($fhirProvider)-> $fhirProvider.baseUrl = BASE_URL
 
 defaultMenu = [{url: '/patients', label: 'Patients'},
                {url: "/patients/new", label: "Register", icon: "fa-plus"}]
@@ -66,7 +67,7 @@ MRN_SYSTEM = 'urn:oid:1.2.36.146.595.217.0.1'
 
 medicalRecordNumber = (identifiers)->
   mrn = identifiers.filter((i)-> i.system == MRN_SYSTEM)[0]
-  mrn.value
+  mrn && mrn.value
 
 app.filter 'mrn', ()-> medicalRecordNumber
 
@@ -148,8 +149,8 @@ app.controller 'PatientShowCtrl', ($rootScope, $scope, $routeParams, $fhir) ->
 
   $rootScope.menu.push({icon: 'fa-edit', url:  "/patients/#{$routeParams.id}/edit", label: 'edit'})
 
-  url = "/Patient/#{$routeParams.id}?_format=application/json"
-  $rootScope.progress = $fhir.read url, (data)->
+  url = BASE_URL + "/Patient/#{$routeParams.id}?_format=application/json"
+  $rootScope.progress = $fhir.read url , (data)->
     $scope.patient = data.content
 
 baseMrn = {
@@ -210,7 +211,7 @@ app.controller 'PatientEditCtrl', ($rootScope, $location, $scope, $routeParams, 
 
   $rootScope.menu.push({active: true, icon: 'fa-edit', url:  "/patients/#{ptId}/edit", label: 'edit'})
 
-  ptUrl = "/Patient/#{ptId}?_format=application/json"
+  ptUrl = BASE_URL + "/Patient/#{ptId}?_format=application/json"
 
   $rootScope.progress = $fhir.read ptUrl, (data)->
     $scope.ptVersion = data.id
