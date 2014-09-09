@@ -153,6 +153,14 @@ app.controller 'PatientShowCtrl', ($rootScope, $scope, $routeParams, $fhir) ->
   $rootScope.progress = $fhir.read url , (data)->
     $scope.patient = data.content
 
+  $scope.showHistory = () ->
+    console.log($routeParams.id)
+    url = BASE_URL + "/Patient/#{$routeParams.id}/_history?_format=application/json"
+    $rootScope.progress = $fhir.read url, (data)->
+      $scope.history = data.content
+    console.log($scope.history)
+
+
 baseMrn = {
   "use": "usual",
   "label": "MRN",

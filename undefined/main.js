@@ -200,9 +200,17 @@
       label: 'edit'
     });
     url = BASE_URL + ("/Patient/" + $routeParams.id + "?_format=application/json");
-    return $rootScope.progress = $fhir.read(url, function(data) {
+    $rootScope.progress = $fhir.read(url, function(data) {
       return $scope.patient = data.content;
     });
+    return $scope.showHistory = function() {
+      console.log($routeParams.id);
+      url = BASE_URL + ("/Patient/" + $routeParams.id + "/_history?_format=application/json");
+      $rootScope.progress = $fhir.read(url, function(data) {
+        return $scope.history = data.content;
+      });
+      return console.log($scope.history);
+    };
   });
 
   baseMrn = {

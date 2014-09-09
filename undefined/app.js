@@ -200,9 +200,17 @@
       label: 'edit'
     });
     url = BASE_URL + ("/Patient/" + $routeParams.id + "?_format=application/json");
-    return $rootScope.progress = $fhir.read(url, function(data) {
+    $rootScope.progress = $fhir.read(url, function(data) {
       return $scope.patient = data.content;
     });
+    return $scope.showHistory = function() {
+      console.log($routeParams.id);
+      url = BASE_URL + ("/Patient/" + $routeParams.id + "/_history?_format=application/json");
+      $rootScope.progress = $fhir.read(url, function(data) {
+        return $scope.history = data.content;
+      });
+      return console.log($scope.history);
+    };
   });
 
   baseMrn = {
@@ -359,8 +367,7 @@ angular.module('regi').run(['$templateCache', function($templateCache) {
     "        </div>\n" +
     "      </div>\n" +
     "\n" +
-    "\n" +
-    "      <fs-input as=\"text\" name=\"birthDate\" label=\"Birth Date\"></fs-input>\n" +
+    "      <fs-input as=\"fs-date\" name=\"birthDate\" label=\"Birth Date\"></fs-input>\n" +
     "    </fieldset>\n" +
     "    </fs-form-for>\n" +
     "\n" +
@@ -508,7 +515,7 @@ angular.module('regi').run(['$templateCache', function($templateCache) {
     "\n" +
     "<div class=\"btns\">\n" +
     "  <a class=\"btn btn-success\" ng-click=\"register()\">Register</a>\n" +
-    "  <a class=\"btn btn-default\" href=\"#/patients\">cancel</a>\n" +
+    "  <a class=\"btn btn-default\" href=\"#/patients\">Cancel</a>\n" +
     "</div>\n"
   );
 
@@ -569,6 +576,18 @@ angular.module('regi').run(['$templateCache', function($templateCache) {
     "  </span>\n" +
     "</div>\n" +
     "\n" +
+    "<a class=\"btn btn-default\" ng-click=\"showHistory()\" href=\"\">History</a>\n" +
+    "\n" +
+    "<table class=\"table table-compact\">\n" +
+    "  <thead>\n" +
+    "    <tr>\n" +
+    "      <th>Hx records</th>\n" +
+    "    </tr>\n" +
+    "  </thead>\n" +
+    "  <tr ng-repeat=\"entry in history.entry\">\n" +
+    "    <td> {{entry}}</td>\n" +
+    "  </tr>\n" +
+    "</table>\n" +
     "<!-- <code><pre> {{ patient | json}} </pre></code> -->\n"
   );
 
