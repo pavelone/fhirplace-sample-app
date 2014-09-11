@@ -53,3 +53,14 @@
   </span>
 </div>
 
+<table class="table table-compact">
+  <thead>
+    <tr>
+      <th>Hx records</th>
+    </tr>
+  </thead>
+  <tr ng-repeat="entry in history.entry">
+    <td> {{entry}}</td>
+  </tr>
+</table>
+<!-- <code><pre> {{ patient | json}} </pre></code> -->

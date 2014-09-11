@@ -19,6 +19,9 @@
     }).when('/patients/:id/edit', {
       templateUrl: '/views/patients/edit.html',
       controller: 'PatientEditCtrl'
+    }).when('/patients/:id/history', {
+      templateUrl: '/views/patients/history.html',
+      controller: 'PatientHistoryCtrl'
     }).otherwise({
       redirectTo: '/'
     });
@@ -52,6 +55,7 @@
       var res;
       res = i.content;
       res._id = i.id;
+      console.log(i.id);
       return res;
     });
   };
@@ -199,6 +203,11 @@
       url: "/patients/" + $routeParams.id + "/edit",
       label: 'edit'
     });
+    $rootScope.menu.push({
+      icon: null,
+      url: "/patients/" + $routeParams.id + "/history",
+      label: 'history'
+    });
     url = BASE_URL + ("/Patient/" + $routeParams.id + "?_format=application/json");
     $rootScope.progress = $fhir.read(url, function(data) {
       return $scope.patient = data.content;
@@ -206,10 +215,16 @@
     return $scope.showHistory = function() {
       console.log($routeParams.id);
       url = BASE_URL + ("/Patient/" + $routeParams.id + "/_history?_format=application/json");
-      $rootScope.progress = $fhir.read(url, function(data) {
+      return $rootScope.progress = $fhir.read(url, function(data) {
         return $scope.history = data.content;
       });
-      return console.log($scope.history);
+      /*
+      url = BASE_URL + "/Patient/#{$routeParams.id}/_history?_format=application/json"
+      $rootScope.progress = $fhir.history BASE_URL, "", (data)->
+        $scope.history = data.content
+      console.log($scope.history)
+      */
+
     };
   });
 
@@ -306,6 +321,7 @@
     $rootScope.progress = $fhir.read(ptUrl, function(data) {
       var _base, _base1;
       $scope.ptVersion = data.id;
+      console.log(data.id);
       (_base = data.content).telecom || (_base.telecom = []);
       (_base1 = data.content).address || (_base1.address = []);
       return $scope.entity = data.content;
@@ -321,6 +337,28 @@
         return $location.path("/patients/" + ptId);
       });
     };
+  });
+
+  app.controller('PatientHistoryCtrl', function($rootScope, $location, $scope, $routeParams, $fhir) {
+    var menuItem, url;
+    $rootScope.menu = angular.copy(defaultMenu);
+    menuItem = $rootScope.menu[1];
+    menuItem.label = $routeParams.id;
+    menuItem.icon = null;
+    menuItem.url = "/patients/" + $routeParams.id;
+    $rootScope.menu.push({
+      icon: null,
+      url: "/patients/" + $routeParams.id + "/history",
+      label: 'history'
+    });
+    url = BASE_URL + ("/Patient/" + $routeParams.id + "?_format=application/json");
+    $rootScope.progress = $fhir.read(url, function(data) {
+      return $scope.patient = data.content;
+    });
+    url = BASE_URL + ("/Patient/" + $routeParams.id + "/_history?_format=application/json");
+    return $rootScope.progress = $fhir.read(url, function(data) {
+      return $scope.history = data.content;
+    });
   });
 
 }).call(this);

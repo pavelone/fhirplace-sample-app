@@ -25,10 +25,14 @@ app = angular.module 'regi', [
       .when '/patients/:id/edit',
         templateUrl: '/views/patients/edit.html'
         controller: 'PatientEditCtrl'
+      .when '/patients/:id/history',
+        templateUrl: '/views/patients/history.html'
+        controller: 'PatientHistoryCtrl'
       .otherwise
         redirectTo: '/'
 
 BASE_URL = 'http://try-fhirplace.hospital-systems.com'
+#BASE_URL = 'http://localhost:3000'
 
 app.config ($fhirProvider)-> $fhirProvider.baseUrl = BASE_URL
 
@@ -42,6 +46,7 @@ mapResources = (atom)->
   (atom.entry || []).map (i)->
      res = i.content
      res._id = i.id
+     console.log i.id
      res
 
 identity = (i)-> i
@@ -148,6 +153,7 @@ app.controller 'PatientShowCtrl', ($rootScope, $scope, $routeParams, $fhir) ->
   menuItem.url = "/patients/#{$routeParams.id}"
 
   $rootScope.menu.push({icon: 'fa-edit', url:  "/patients/#{$routeParams.id}/edit", label: 'edit'})
+  $rootScope.menu.push({icon: null, url:  "/patients/#{$routeParams.id}/history", label: 'history'})
 
   url = BASE_URL + "/Patient/#{$routeParams.id}?_format=application/json"
   $rootScope.progress = $fhir.read url , (data)->
@@ -158,8 +164,12 @@ app.controller 'PatientShowCtrl', ($rootScope, $scope, $routeParams, $fhir) ->
     url = BASE_URL + "/Patient/#{$routeParams.id}/_history?_format=application/json"
     $rootScope.progress = $fhir.read url, (data)->
       $scope.history = data.content
+    ###
+    url = BASE_URL + "/Patient/#{$routeParams.id}/_history?_format=application/json"
+    $rootScope.progress = $fhir.history BASE_URL, "", (data)->
+      $scope.history = data.content
     console.log($scope.history)
-
+    ###
 
 baseMrn = {
   "use": "usual",
@@ -223,6 +233,7 @@ app.controller 'PatientEditCtrl', ($rootScope, $location, $scope, $routeParams, 
 
   $rootScope.progress = $fhir.read ptUrl, (data)->
     $scope.ptVersion = data.id
+    console.log data.id
     data.content.telecom ||= []
     data.content.address ||= []
     $scope.entity = data.content
@@ -233,3 +244,24 @@ app.controller 'PatientEditCtrl', ($rootScope, $location, $scope, $routeParams, 
     content = {content: $scope.entity, id: $scope.ptVersion}
     $rootScope.progress = $fhir.update content, (data)->
       $location.path("/patients/#{ptId}")
+
+
+app.controller 'PatientHistoryCtrl', ($rootScope, $location, $scope, $routeParams, $fhir) ->
+  $rootScope.menu = angular.copy(defaultMenu)
+  menuItem = $rootScope.menu[1]
+  menuItem.label = $routeParams.id
+  menuItem.icon = null
+  menuItem.url = "/patients/#{$routeParams.id}"
+
+  $rootScope.menu.push({icon: null, url:  "/patients/#{$routeParams.id}/history", label: 'history'})
+
+  url = BASE_URL + "/Patient/#{$routeParams.id}?_format=application/json"
+  $rootScope.progress = $fhir.read url , (data)->
+    $scope.patient = data.content
+
+  url = BASE_URL + "/Patient/#{$routeParams.id}/_history?_format=application/json"
+  $rootScope.progress = $fhir.read url, (data)->
+    $scope.history = data.content
+
+
+

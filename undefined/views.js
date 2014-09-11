@@ -152,6 +152,76 @@ angular.module('regi').run(['$templateCache', function($templateCache) {
   );
 
 
+  $templateCache.put('/views/patients/history.html',
+    "<div class=\"row\">\n" +
+    "  <div clas=\"col-md-3\">\n" +
+    "    <img ng-src=\"{{patient.photo | dataUrl}}\" class=\"person-photo large\"/>\n" +
+    "  </div>\n" +
+    "  <div clas=\"col-md-9\">\n" +
+    "    <h1> {{ patient.name[0] | humanName }}\n" +
+    "      <br/>\n" +
+    "      {{patient.gender.coding[0].code || '~'}}/{{ patient.birthDate | age}}</h1>\n" +
+    "  </div>\n" +
+    "</div>\n" +
+    "\n" +
+    "\n" +
+    "<h3> Names </h3>\n" +
+    "<hr/>\n" +
+    "<div ng-repeat=\"nm in patient.name\">\n" +
+    "  <span class=\"muted-text\">{{nm.use}}</span> :\n" +
+    "  <span>{{nm.prefix}}</span>\n" +
+    "  <span>{{nm.given.join(' ')}}</span>\n" +
+    "  <b>{{nm.family.join(' ')}}</b>\n" +
+    "  <span>{{nm.sufix}}</span>\n" +
+    "</div>\n" +
+    "\n" +
+    "<h3> Address </h3>\n" +
+    "<hr/>\n" +
+    "\n" +
+    "<div ng-repeat=\"ad in patient.address\">\n" +
+    "  <span class=\"muted-text\">{{ad.use}}</span> :\n" +
+    "  <span>{{ad.line.join(' ')}}</span>,\n" +
+    "  <span>{{ad.city}}</span>,\n" +
+    "  <span>{{ad.state}}</span>,\n" +
+    "  <span>{{ad.zip}}</span>\n" +
+    "</div>\n" +
+    "\n" +
+    "<h3> Telecom </h3>\n" +
+    "<hr/>\n" +
+    "\n" +
+    "<div ng-repeat=\"ad in patient.telecom\">\n" +
+    "  <span class=\"muted-text\">{{ad.use}}</span>\n" +
+    "  <span>{{ad.system}}</span>:\n" +
+    "  <span>{{ad.value}}</span>\n" +
+    "</div>\n" +
+    "\n" +
+    "<h3> Contacts </h3>\n" +
+    "<hr/>\n" +
+    "\n" +
+    "<div ng-repeat=\"ad in patient.contact\">\n" +
+    "  <span class=\"muted-text\">{{ad.relationship[0].coding[0].code}}</span> :\n" +
+    "  <span>{{ad.name | humanName}}</span>,\n" +
+    "  <span ng-repeat=\"tel in ad.telecom\">\n" +
+    "    <span class=\"muted-text\">{{tel.use}}</span>\n" +
+    "    <span>{{tel.system}}</span>:\n" +
+    "    <span>{{tel.value}}</span>\n" +
+    "  </span>\n" +
+    "</div>\n" +
+    "\n" +
+    "<table class=\"table table-compact\">\n" +
+    "  <thead>\n" +
+    "    <tr>\n" +
+    "      <th>Hx records</th>\n" +
+    "    </tr>\n" +
+    "  </thead>\n" +
+    "  <tr ng-repeat=\"entry in history.entry\">\n" +
+    "    <td> {{entry}}</td>\n" +
+    "  </tr>\n" +
+    "</table>\n" +
+    "<!-- <code><pre> {{ patient | json}} </pre></code> -->\n"
+  );
+
+
   $templateCache.put('/views/patients/index.html',
     "<div class=\"well\">\n" +
     "  <form ng-submit=\"search()\">\n" +
@@ -248,20 +318,7 @@ angular.module('regi').run(['$templateCache', function($templateCache) {
     "    <span>{{tel.value}}</span>\n" +
     "  </span>\n" +
     "</div>\n" +
-    "\n" +
-    "<a class=\"btn btn-default\" ng-click=\"showHistory()\" href=\"\">History</a>\n" +
-    "\n" +
-    "<table class=\"table table-compact\">\n" +
-    "  <thead>\n" +
-    "    <tr>\n" +
-    "      <th>Hx records</th>\n" +
-    "    </tr>\n" +
-    "  </thead>\n" +
-    "  <tr ng-repeat=\"entry in history.entry\">\n" +
-    "    <td> {{entry}}</td>\n" +
-    "  </tr>\n" +
-    "</table>\n" +
-    "<!-- <code><pre> {{ patient | json}} </pre></code> -->\n"
+    "\n"
   );
 
 

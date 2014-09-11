@@ -19,6 +19,9 @@
     }).when('/patients/:id/edit', {
       templateUrl: '/views/patients/edit.html',
       controller: 'PatientEditCtrl'
+    }).when('/patients/:id/history', {
+      templateUrl: '/views/patients/history.html',
+      controller: 'PatientHistoryCtrl'
     }).otherwise({
       redirectTo: '/'
     });
@@ -52,6 +55,7 @@
       var res;
       res = i.content;
       res._id = i.id;
+      console.log(i.id);
       return res;
     });
   };
@@ -199,6 +203,11 @@
       url: "/patients/" + $routeParams.id + "/edit",
       label: 'edit'
     });
+    $rootScope.menu.push({
+      icon: null,
+      url: "/patients/" + $routeParams.id + "/history",
+      label: 'history'
+    });
     url = BASE_URL + ("/Patient/" + $routeParams.id + "?_format=application/json");
     $rootScope.progress = $fhir.read(url, function(data) {
       return $scope.patient = data.content;
@@ -206,10 +215,16 @@
     return $scope.showHistory = function() {
       console.log($routeParams.id);
       url = BASE_URL + ("/Patient/" + $routeParams.id + "/_history?_format=application/json");
-      $rootScope.progress = $fhir.read(url, function(data) {
+      return $rootScope.progress = $fhir.read(url, function(data) {
         return $scope.history = data.content;
       });
-      return console.log($scope.history);
+      /*
+      url = BASE_URL + "/Patient/#{$routeParams.id}/_history?_format=application/json"
+      $rootScope.progress = $fhir.history BASE_URL, "", (data)->
+        $scope.history = data.content
+      console.log($scope.history)
+      */
+
     };
   });
 
@@ -306,6 +321,7 @@
     $rootScope.progress = $fhir.read(ptUrl, function(data) {
       var _base, _base1;
       $scope.ptVersion = data.id;
+      console.log(data.id);
       (_base = data.content).telecom || (_base.telecom = []);
       (_base1 = data.content).address || (_base1.address = []);
       return $scope.entity = data.content;
@@ -321,6 +337,28 @@
         return $location.path("/patients/" + ptId);
       });
     };
+  });
+
+  app.controller('PatientHistoryCtrl', function($rootScope, $location, $scope, $routeParams, $fhir) {
+    var menuItem, url;
+    $rootScope.menu = angular.copy(defaultMenu);
+    menuItem = $rootScope.menu[1];
+    menuItem.label = $routeParams.id;
+    menuItem.icon = null;
+    menuItem.url = "/patients/" + $routeParams.id;
+    $rootScope.menu.push({
+      icon: null,
+      url: "/patients/" + $routeParams.id + "/history",
+      label: 'history'
+    });
+    url = BASE_URL + ("/Patient/" + $routeParams.id + "?_format=application/json");
+    $rootScope.progress = $fhir.read(url, function(data) {
+      return $scope.patient = data.content;
+    });
+    url = BASE_URL + ("/Patient/" + $routeParams.id + "/_history?_format=application/json");
+    return $rootScope.progress = $fhir.read(url, function(data) {
+      return $scope.history = data.content;
+    });
   });
 
 }).call(this);
@@ -479,6 +517,76 @@ angular.module('regi').run(['$templateCache', function($templateCache) {
   );
 
 
+  $templateCache.put('/views/patients/history.html',
+    "<div class=\"row\">\n" +
+    "  <div clas=\"col-md-3\">\n" +
+    "    <img ng-src=\"{{patient.photo | dataUrl}}\" class=\"person-photo large\"/>\n" +
+    "  </div>\n" +
+    "  <div clas=\"col-md-9\">\n" +
+    "    <h1> {{ patient.name[0] | humanName }}\n" +
+    "      <br/>\n" +
+    "      {{patient.gender.coding[0].code || '~'}}/{{ patient.birthDate | age}}</h1>\n" +
+    "  </div>\n" +
+    "</div>\n" +
+    "\n" +
+    "\n" +
+    "<h3> Names </h3>\n" +
+    "<hr/>\n" +
+    "<div ng-repeat=\"nm in patient.name\">\n" +
+    "  <span class=\"muted-text\">{{nm.use}}</span> :\n" +
+    "  <span>{{nm.prefix}}</span>\n" +
+    "  <span>{{nm.given.join(' ')}}</span>\n" +
+    "  <b>{{nm.family.join(' ')}}</b>\n" +
+    "  <span>{{nm.sufix}}</span>\n" +
+    "</div>\n" +
+    "\n" +
+    "<h3> Address </h3>\n" +
+    "<hr/>\n" +
+    "\n" +
+    "<div ng-repeat=\"ad in patient.address\">\n" +
+    "  <span class=\"muted-text\">{{ad.use}}</span> :\n" +
+    "  <span>{{ad.line.join(' ')}}</span>,\n" +
+    "  <span>{{ad.city}}</span>,\n" +
+    "  <span>{{ad.state}}</span>,\n" +
+    "  <span>{{ad.zip}}</span>\n" +
+    "</div>\n" +
+    "\n" +
+    "<h3> Telecom </h3>\n" +
+    "<hr/>\n" +
+    "\n" +
+    "<div ng-repeat=\"ad in patient.telecom\">\n" +
+    "  <span class=\"muted-text\">{{ad.use}}</span>\n" +
+    "  <span>{{ad.system}}</span>:\n" +
+    "  <span>{{ad.value}}</span>\n" +
+    "</div>\n" +
+    "\n" +
+    "<h3> Contacts </h3>\n" +
+    "<hr/>\n" +
+    "\n" +
+    "<div ng-repeat=\"ad in patient.contact\">\n" +
+    "  <span class=\"muted-text\">{{ad.relationship[0].coding[0].code}}</span> :\n" +
+    "  <span>{{ad.name | humanName}}</span>,\n" +
+    "  <span ng-repeat=\"tel in ad.telecom\">\n" +
+    "    <span class=\"muted-text\">{{tel.use}}</span>\n" +
+    "    <span>{{tel.system}}</span>:\n" +
+    "    <span>{{tel.value}}</span>\n" +
+    "  </span>\n" +
+    "</div>\n" +
+    "\n" +
+    "<table class=\"table table-compact\">\n" +
+    "  <thead>\n" +
+    "    <tr>\n" +
+    "      <th>Hx records</th>\n" +
+    "    </tr>\n" +
+    "  </thead>\n" +
+    "  <tr ng-repeat=\"entry in history.entry\">\n" +
+    "    <td> {{entry}}</td>\n" +
+    "  </tr>\n" +
+    "</table>\n" +
+    "<!-- <code><pre> {{ patient | json}} </pre></code> -->\n"
+  );
+
+
   $templateCache.put('/views/patients/index.html',
     "<div class=\"well\">\n" +
     "  <form ng-submit=\"search()\">\n" +
@@ -575,20 +683,7 @@ angular.module('regi').run(['$templateCache', function($templateCache) {
     "    <span>{{tel.value}}</span>\n" +
     "  </span>\n" +
     "</div>\n" +
-    "\n" +
-    "<a class=\"btn btn-default\" ng-click=\"showHistory()\" href=\"\">History</a>\n" +
-    "\n" +
-    "<table class=\"table table-compact\">\n" +
-    "  <thead>\n" +
-    "    <tr>\n" +
-    "      <th>Hx records</th>\n" +
-    "    </tr>\n" +
-    "  </thead>\n" +
-    "  <tr ng-repeat=\"entry in history.entry\">\n" +
-    "    <td> {{entry}}</td>\n" +
-    "  </tr>\n" +
-    "</table>\n" +
-    "<!-- <code><pre> {{ patient | json}} </pre></code> -->\n"
+    "\n"
   );
 
 
