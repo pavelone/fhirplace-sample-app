@@ -40,9 +40,6 @@
   <span>{{ad.value}}</span>
 </div>
 
-<h3> Contacts </h3>
-<hr/>
-
 <div ng-repeat="ad in patient.contact">
   <span class="muted-text">{{ad.relationship[0].coding[0].code}}</span> :
   <span>{{ad.name | humanName}}</span>,

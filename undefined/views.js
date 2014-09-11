@@ -164,60 +164,58 @@ angular.module('regi').run(['$templateCache', function($templateCache) {
     "  </div>\n" +
     "</div>\n" +
     "\n" +
-    "\n" +
-    "<h3> Names </h3>\n" +
-    "<hr/>\n" +
-    "<div ng-repeat=\"nm in patient.name\">\n" +
-    "  <span class=\"muted-text\">{{nm.use}}</span> :\n" +
-    "  <span>{{nm.prefix}}</span>\n" +
-    "  <span>{{nm.given.join(' ')}}</span>\n" +
-    "  <b>{{nm.family.join(' ')}}</b>\n" +
-    "  <span>{{nm.sufix}}</span>\n" +
+    "<div>\n" +
+    "  <div class=\"col-xs-2\"><h4>Updated</h4></div><div class=\"col-xs-10\"><h4>History Record</h4></div>\n" +
+    "</div>\n" +
+    "<div ng-repeat=\"entry in history.entry | orderBy:'updated':true\" class=\"small\">\n" +
+    "  <div class=\"col-xs-2\">{{entry.updated | date:'MM/dd/yyyy @ h:mma'}}</div>\n" +
+    "  <div class=\"col-xs-10\">\n" +
+    "    <b>Patient info:</b>\n" +
+    "    <span>MRN: </span><span>{{entry.content.identifier[0].value}},</span>\n" +
+    "    <span>Gender: </span><span>{{entry.content.gender.text}},</span>\n" +
+    "    <span>Birth Date: </span><span>{{entry.content.birthDate}},</span>\n" +
+    "    <b>Names: </b>\n" +
+    "    <span ng-repeat=\"nm in entry.content.name\">\n" +
+    "    <span>{{nm.use+\", \"+nm.family.join(' ')+\", \"+nm.given.join(' ')}},</span>\n" +
+    "    </span>\n" +
+    "    <b>Telecom: </b>\n" +
+    "    <span ng-repeat=\"tm in entry.content.telecom\">\n" +
+    "    <span>{{tm.system+\", \"+tm.use+\", \"+tm.value}},</span>\n" +
+    "    </span>\n" +
+    "    <b>Address</b>\n" +
+    "    <span ng-repeat=\"ad in entry.content.address\">\n" +
+    "    <span>{{ad.use+\", \"+ad.line.join(' ')+\", \"+ad.city+\", \"+ad.state+\", \"+ad.zip+\", \"+ad.country}},</span>\n" +
+    "    </span>\n" +
+    "  </div>\n" +
     "</div>\n" +
     "\n" +
-    "<h3> Address </h3>\n" +
-    "<hr/>\n" +
+    "<!--\n" +
+    "Patient Info\n" +
+    "MRN entry.content.identifier[0].value\n" +
+    "Gender entry.content.gender.text or entry.content.gender.coding.code\n" +
+    "Photo entry.content.photo.data\n" +
+    "Birth Date entry.content.birthDate\n" +
     "\n" +
-    "<div ng-repeat=\"ad in patient.address\">\n" +
-    "  <span class=\"muted-text\">{{ad.use}}</span> :\n" +
-    "  <span>{{ad.line.join(' ')}}</span>,\n" +
-    "  <span>{{ad.city}}</span>,\n" +
-    "  <span>{{ad.state}}</span>,\n" +
-    "  <span>{{ad.zip}}</span>\n" +
-    "</div>\n" +
+    "Names (multiple) entry.content.name[]\n" +
+    "Use entry.content.name[].use\n" +
+    "Family (multiple) entry.content.name[].family[]\n" +
+    "Given (multiple) entry.content.name[].given[]\n" +
     "\n" +
-    "<h3> Telecom </h3>\n" +
-    "<hr/>\n" +
+    "Telecoms (multiple) entry.content.telecom[]\n" +
+    "System entry.content.telecom[].system\n" +
+    "Use entry.content.telecom[].use\n" +
+    "Telecom entry.content.telecom[].value\n" +
     "\n" +
-    "<div ng-repeat=\"ad in patient.telecom\">\n" +
-    "  <span class=\"muted-text\">{{ad.use}}</span>\n" +
-    "  <span>{{ad.system}}</span>:\n" +
-    "  <span>{{ad.value}}</span>\n" +
-    "</div>\n" +
+    "Addresses (multiple) entry.content.address[]\n" +
+    "Use entry.content.address[].use\n" +
+    "Line (multiple) entry.content.address[].line[]\n" +
+    "City entry.content.address[].city\n" +
+    "State entry.content.address[].state\n" +
+    "Zip entry.content.address[].zip\n" +
+    "Country entry.content.address[].country\n" +
     "\n" +
-    "<h3> Contacts </h3>\n" +
-    "<hr/>\n" +
-    "\n" +
-    "<div ng-repeat=\"ad in patient.contact\">\n" +
-    "  <span class=\"muted-text\">{{ad.relationship[0].coding[0].code}}</span> :\n" +
-    "  <span>{{ad.name | humanName}}</span>,\n" +
-    "  <span ng-repeat=\"tel in ad.telecom\">\n" +
-    "    <span class=\"muted-text\">{{tel.use}}</span>\n" +
-    "    <span>{{tel.system}}</span>:\n" +
-    "    <span>{{tel.value}}</span>\n" +
-    "  </span>\n" +
-    "</div>\n" +
-    "\n" +
-    "<table class=\"table table-compact\">\n" +
-    "  <thead>\n" +
-    "    <tr>\n" +
-    "      <th>Hx records</th>\n" +
-    "    </tr>\n" +
-    "  </thead>\n" +
-    "  <tr ng-repeat=\"entry in history.entry\">\n" +
-    "    <td> {{entry}}</td>\n" +
-    "  </tr>\n" +
-    "</table>\n" +
+    "Active entry.content.active\n" +
+    "-->\n" +
     "<!-- <code><pre> {{ patient | json}} </pre></code> -->\n"
   );
 
@@ -305,9 +303,6 @@ angular.module('regi').run(['$templateCache', function($templateCache) {
     "  <span>{{ad.system}}</span>:\n" +
     "  <span>{{ad.value}}</span>\n" +
     "</div>\n" +
-    "\n" +
-    "<h3> Contacts </h3>\n" +
-    "<hr/>\n" +
     "\n" +
     "<div ng-repeat=\"ad in patient.contact\">\n" +
     "  <span class=\"muted-text\">{{ad.relationship[0].coding[0].code}}</span> :\n" +

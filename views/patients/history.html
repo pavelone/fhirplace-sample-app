@@ -9,58 +9,56 @@
   </div>
 </div>
 
-
-<h3> Names </h3>
-<hr/>
-<div ng-repeat="nm in patient.name">
-  <span class="muted-text">{{nm.use}}</span> :
-  <span>{{nm.prefix}}</span>
-  <span>{{nm.given.join(' ')}}</span>
-  <b>{{nm.family.join(' ')}}</b>
-  <span>{{nm.sufix}}</span>
+<div>
+  <div class="col-xs-2"><h4>Updated</h4></div><div class="col-xs-10"><h4>History Record</h4></div>
+</div>
+<div ng-repeat="entry in history.entry | orderBy:'updated':true" class="small">
+  <div class="col-xs-2">{{entry.updated | date:'MM/dd/yyyy @ h:mma'}}</div>
+  <div class="col-xs-10">
+    <b>Patient info:</b>
+    <span>MRN: </span><span>{{entry.content.identifier[0].value}},</span>
+    <span>Gender: </span><span>{{entry.content.gender.text}},</span>
+    <span>Birth Date: </span><span>{{entry.content.birthDate}},</span>
+    <b>Names: </b>
+    <span ng-repeat="nm in entry.content.name">
+    <span>{{nm.use+", "+nm.family.join(' ')+", "+nm.given.join(' ')}},</span>
+    </span>
+    <b>Telecom: </b>
+    <span ng-repeat="tm in entry.content.telecom">
+    <span>{{tm.system+", "+tm.use+", "+tm.value}},</span>
+    </span>
+    <b>Address</b>
+    <span ng-repeat="ad in entry.content.address">
+    <span>{{ad.use+", "+ad.line.join(' ')+", "+ad.city+", "+ad.state+", "+ad.zip+", "+ad.country}},</span>
+    </span>
+  </div>
 </div>
 
-<h3> Address </h3>
-<hr/>
+<!--
+Patient Info
+MRN entry.content.identifier[0].value
+Gender entry.content.gender.text or entry.content.gender.coding.code
+Photo entry.content.photo.data
+Birth Date entry.content.birthDate
 
-<div ng-repeat="ad in patient.address">
-  <span class="muted-text">{{ad.use}}</span> :
-  <span>{{ad.line.join(' ')}}</span>,
-  <span>{{ad.city}}</span>,
-  <span>{{ad.state}}</span>,
-  <span>{{ad.zip}}</span>
-</div>
+Names (multiple) entry.content.name[]
+Use entry.content.name[].use
+Family (multiple) entry.content.name[].family[]
+Given (multiple) entry.content.name[].given[]
 
-<h3> Telecom </h3>
-<hr/>
+Telecoms (multiple) entry.content.telecom[]
+System entry.content.telecom[].system
+Use entry.content.telecom[].use
+Telecom entry.content.telecom[].value
 
-<div ng-repeat="ad in patient.telecom">
-  <span class="muted-text">{{ad.use}}</span>
-  <span>{{ad.system}}</span>:
-  <span>{{ad.value}}</span>
-</div>
+Addresses (multiple) entry.content.address[]
+Use entry.content.address[].use
+Line (multiple) entry.content.address[].line[]
+City entry.content.address[].city
+State entry.content.address[].state
+Zip entry.content.address[].zip
+Country entry.content.address[].country
 
-<h3> Contacts </h3>
-<hr/>
-
-<div ng-repeat="ad in patient.contact">
-  <span class="muted-text">{{ad.relationship[0].coding[0].code}}</span> :
-  <span>{{ad.name | humanName}}</span>,
-  <span ng-repeat="tel in ad.telecom">
-    <span class="muted-text">{{tel.use}}</span>
-    <span>{{tel.system}}</span>:
-    <span>{{tel.value}}</span>
-  </span>
-</div>
-
-<table class="table table-compact">
-  <thead>
-    <tr>
-      <th>Hx records</th>
-    </tr>
-  </thead>
-  <tr ng-repeat="entry in history.entry">
-    <td> {{entry}}</td>
-  </tr>
-</table>
+Active entry.content.active
+-->
 <!-- <code><pre> {{ patient | json}} </pre></code> -->

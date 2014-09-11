@@ -151,25 +151,14 @@ app.controller 'PatientShowCtrl', ($rootScope, $scope, $routeParams, $fhir) ->
   menuItem.label = $routeParams.id
   menuItem.icon = null
   menuItem.url = "/patients/#{$routeParams.id}"
+  menuItem.active = yes
 
   $rootScope.menu.push({icon: 'fa-edit', url:  "/patients/#{$routeParams.id}/edit", label: 'edit'})
-  $rootScope.menu.push({icon: null, url:  "/patients/#{$routeParams.id}/history", label: 'history'})
+  $rootScope.menu.push({icon: 'fa-th-list', url:  "/patients/#{$routeParams.id}/history", label: 'history'})
 
   url = BASE_URL + "/Patient/#{$routeParams.id}?_format=application/json"
   $rootScope.progress = $fhir.read url , (data)->
     $scope.patient = data.content
-
-  $scope.showHistory = () ->
-    console.log($routeParams.id)
-    url = BASE_URL + "/Patient/#{$routeParams.id}/_history?_format=application/json"
-    $rootScope.progress = $fhir.read url, (data)->
-      $scope.history = data.content
-    ###
-    url = BASE_URL + "/Patient/#{$routeParams.id}/_history?_format=application/json"
-    $rootScope.progress = $fhir.history BASE_URL, "", (data)->
-      $scope.history = data.content
-    console.log($scope.history)
-    ###
 
 baseMrn = {
   "use": "usual",
@@ -253,7 +242,7 @@ app.controller 'PatientHistoryCtrl', ($rootScope, $location, $scope, $routeParam
   menuItem.icon = null
   menuItem.url = "/patients/#{$routeParams.id}"
 
-  $rootScope.menu.push({icon: null, url:  "/patients/#{$routeParams.id}/history", label: 'history'})
+  $rootScope.menu.push({active: true, icon: 'fa-th-list', url:  "/patients/#{$routeParams.id}/history", label: 'history'})
 
   url = BASE_URL + "/Patient/#{$routeParams.id}?_format=application/json"
   $rootScope.progress = $fhir.read url , (data)->
@@ -262,6 +251,9 @@ app.controller 'PatientHistoryCtrl', ($rootScope, $location, $scope, $routeParam
   url = BASE_URL + "/Patient/#{$routeParams.id}/_history?_format=application/json"
   $rootScope.progress = $fhir.read url, (data)->
     $scope.history = data.content
+    console.log $scope.history
+    #console.log mapResources(data)
+
 
 
 
