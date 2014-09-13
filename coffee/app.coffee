@@ -154,7 +154,7 @@ app.controller 'PatientShowCtrl', ($rootScope, $scope, $routeParams, $fhir) ->
   menuItem.active = yes
 
   $rootScope.menu.push({icon: 'fa-edit', url:  "/patients/#{$routeParams.id}/edit", label: 'edit'})
-  $rootScope.menu.push({icon: 'fa-th-list', url:  "/patients/#{$routeParams.id}/history", label: 'history'})
+  $rootScope.menu.push({icon: 'fa-th-list', url:  "/patients/#{$routeParams.id}/history", label: 'history', guess: true})
 
   url = BASE_URL + "/Patient/#{$routeParams.id}?_format=application/json"
   $rootScope.progress = $fhir.read url , (data)->
@@ -162,7 +162,6 @@ app.controller 'PatientShowCtrl', ($rootScope, $scope, $routeParams, $fhir) ->
 
   $scope.deletePatient = ()->
     url = BASE_URL + "/Patient/#{$routeParams.id}"
-    console.log url
     $rootScope.progress = $fhir["delete"] url, ()->
       $location.path("/patients/")
 

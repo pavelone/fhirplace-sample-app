@@ -207,7 +207,8 @@
     $rootScope.menu.push({
       icon: 'fa-th-list',
       url: "/patients/" + $routeParams.id + "/history",
-      label: 'history'
+      label: 'history',
+      guess: true
     });
     url = BASE_URL + ("/Patient/" + $routeParams.id + "?_format=application/json");
     $rootScope.progress = $fhir.read(url, function(data) {
@@ -215,7 +216,6 @@
     });
     return $scope.deletePatient = function() {
       url = BASE_URL + ("/Patient/" + $routeParams.id);
-      console.log(url);
       return $rootScope.progress = $fhir["delete"](url, function() {
         return $location.path("/patients/");
       });
