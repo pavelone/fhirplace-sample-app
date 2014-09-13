@@ -210,9 +210,16 @@
       label: 'history'
     });
     url = BASE_URL + ("/Patient/" + $routeParams.id + "?_format=application/json");
-    return $rootScope.progress = $fhir.read(url, function(data) {
+    $rootScope.progress = $fhir.read(url, function(data) {
       return $scope.patient = data.content;
     });
+    return $scope.deletePatient = function() {
+      url = BASE_URL + ("/Patient/" + $routeParams.id);
+      console.log(url);
+      return $rootScope.progress = $fhir["delete"](url, function() {
+        return $location.path("/patients/");
+      });
+    };
   });
 
   baseMrn = {

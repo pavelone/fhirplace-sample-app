@@ -160,6 +160,12 @@ app.controller 'PatientShowCtrl', ($rootScope, $scope, $routeParams, $fhir) ->
   $rootScope.progress = $fhir.read url , (data)->
     $scope.patient = data.content
 
+  $scope.deletePatient = ()->
+    url = BASE_URL + "/Patient/#{$routeParams.id}"
+    console.log url
+    $rootScope.progress = $fhir["delete"] url, ()->
+      $location.path("/patients/")
+
 baseMrn = {
   "use": "usual",
   "label": "MRN",

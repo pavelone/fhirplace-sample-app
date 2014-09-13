@@ -210,9 +210,16 @@
       label: 'history'
     });
     url = BASE_URL + ("/Patient/" + $routeParams.id + "?_format=application/json");
-    return $rootScope.progress = $fhir.read(url, function(data) {
+    $rootScope.progress = $fhir.read(url, function(data) {
       return $scope.patient = data.content;
     });
+    return $scope.deletePatient = function() {
+      url = BASE_URL + ("/Patient/" + $routeParams.id);
+      console.log(url);
+      return $rootScope.progress = $fhir["delete"](url, function() {
+        return $location.path("/patients/");
+      });
+    };
   });
 
   baseMrn = {
@@ -666,6 +673,10 @@ angular.module('regi').run(['$templateCache', function($templateCache) {
     "    <span>{{tel.system}}</span>:\n" +
     "    <span>{{tel.value}}</span>\n" +
     "  </span>\n" +
+    "</div>\n" +
+    "\n" +
+    "<div class=\"btns\">\n" +
+    "  <a class=\"btn\" ng-click=\"deletePatient()\">Delete</a>\n" +
     "</div>\n" +
     "\n"
   );

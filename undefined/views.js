@@ -313,6 +313,10 @@ angular.module('regi').run(['$templateCache', function($templateCache) {
     "    <span>{{tel.value}}</span>\n" +
     "  </span>\n" +
     "</div>\n" +
+    "\n" +
+    "<div class=\"btns\">\n" +
+    "  <a class=\"btn\" ng-click=\"deletePatient()\">Delete</a>\n" +
+    "</div>\n" +
     "\n"
   );
 
