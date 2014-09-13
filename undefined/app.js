@@ -199,6 +199,9 @@
     menuItem.icon = null;
     menuItem.url = "/patients/" + $routeParams.id;
     menuItem.active = true;
+    $scope.pt = {
+      selectedVersion: null
+    };
     $rootScope.menu.push({
       icon: 'fa-edit',
       url: "/patients/" + $routeParams.id + "/edit",
@@ -214,11 +217,18 @@
     $rootScope.progress = $fhir.read(url, function(data) {
       return $scope.patient = data.content;
     });
-    return $scope.deletePatient = function() {
+    url = BASE_URL + ("/Patient/" + $routeParams.id + "/_history?_format=application/json");
+    $rootScope.progress = $fhir.read(url, function(data) {
+      return $scope.history = data.content;
+    });
+    $scope.deletePatient = function() {
       url = BASE_URL + ("/Patient/" + $routeParams.id);
       return $rootScope.progress = $fhir["delete"](url, function() {
         return $location.path("/patients/");
       });
+    };
+    return $scope.switchVersion = function() {
+      return $scope.patient = $scope.pt.selectedVersion.content;
     };
   });
 
@@ -352,8 +362,7 @@
     });
     url = BASE_URL + ("/Patient/" + $routeParams.id + "/_history?_format=application/json");
     return $rootScope.progress = $fhir.read(url, function(data) {
-      $scope.history = data.content;
-      return console.log($scope.history);
+      return $scope.history = data.content;
     });
   });
 
@@ -624,7 +633,7 @@ angular.module('regi').run(['$templateCache', function($templateCache) {
 
   $templateCache.put('/views/patients/show.html',
     "<div class=\"row\">\n" +
-    "  <div clas=\"col-md-3\">\n" +
+    "  <div class=\"col-md-3\">\n" +
     "    <img ng-src=\"{{patient.photo | dataUrl}}\" class=\"person-photo large\"/>\n" +
     "  </div>\n" +
     "  <div clas=\"col-md-9\">\n" +
@@ -634,6 +643,15 @@ angular.module('regi').run(['$templateCache', function($templateCache) {
     "  </div>\n" +
     "</div>\n" +
     "\n" +
+    "<div class=\"row\">\n" +
+    "  <div class=\"col-xs-5\">\n" +
+    "    <fs-form-for model=\"pt\">\n" +
+    "      <fieldset>\n" +
+    "        <fs-input as=\"fs-select\" ng-change=\"switchVersion()\" name=\"selectedVersion\" items=\"history.entry\" label=\"Versions\">{{item.updated | date:'MM/dd/yyyy @ h:mma'}}</fs-input>\n" +
+    "      </fieldset>  \n" +
+    "    </fs-form-for>\n" +
+    "  </div>\n" +
+    "</div>\n" +
     "\n" +
     "<h3> Names </h3>\n" +
     "<hr/>\n" +
@@ -677,8 +695,7 @@ angular.module('regi').run(['$templateCache', function($templateCache) {
     "\n" +
     "<div class=\"btns\">\n" +
     "  <a class=\"btn\" ng-click=\"deletePatient()\">Delete</a>\n" +
-    "</div>\n" +
-    "\n"
+    "</div>\n"
   );
 
 

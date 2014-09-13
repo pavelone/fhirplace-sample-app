@@ -199,6 +199,9 @@
     menuItem.icon = null;
     menuItem.url = "/patients/" + $routeParams.id;
     menuItem.active = true;
+    $scope.pt = {
+      selectedVersion: null
+    };
     $rootScope.menu.push({
       icon: 'fa-edit',
       url: "/patients/" + $routeParams.id + "/edit",
@@ -214,11 +217,18 @@
     $rootScope.progress = $fhir.read(url, function(data) {
       return $scope.patient = data.content;
     });
-    return $scope.deletePatient = function() {
+    url = BASE_URL + ("/Patient/" + $routeParams.id + "/_history?_format=application/json");
+    $rootScope.progress = $fhir.read(url, function(data) {
+      return $scope.history = data.content;
+    });
+    $scope.deletePatient = function() {
       url = BASE_URL + ("/Patient/" + $routeParams.id);
       return $rootScope.progress = $fhir["delete"](url, function() {
         return $location.path("/patients/");
       });
+    };
+    return $scope.switchVersion = function() {
+      return $scope.patient = $scope.pt.selectedVersion.content;
     };
   });
 
@@ -352,8 +362,7 @@
     });
     url = BASE_URL + ("/Patient/" + $routeParams.id + "/_history?_format=application/json");
     return $rootScope.progress = $fhir.read(url, function(data) {
-      $scope.history = data.content;
-      return console.log($scope.history);
+      return $scope.history = data.content;
     });
   });
 

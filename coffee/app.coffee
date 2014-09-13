@@ -33,7 +33,7 @@ app = angular.module 'regi', [
 
 BASE_URL = 'http://try-fhirplace.hospital-systems.com'
 #BASE_URL = 'http://localhost:3000'
-
+#BASE_URL = 'http://fhir.healthintersections.com.au/open'
 app.config ($fhirProvider)-> $fhirProvider.baseUrl = BASE_URL
 
 defaultMenu = [{url: '/patients', label: 'Patients'},
@@ -153,6 +153,10 @@ app.controller 'PatientShowCtrl', ($rootScope, $scope, $routeParams, $fhir) ->
   menuItem.url = "/patients/#{$routeParams.id}"
   menuItem.active = yes
 
+  $scope.pt = {
+    selectedVersion: null
+  }
+
   $rootScope.menu.push({icon: 'fa-edit', url:  "/patients/#{$routeParams.id}/edit", label: 'edit'})
   $rootScope.menu.push({icon: 'fa-th-list', url:  "/patients/#{$routeParams.id}/history", label: 'history', guess: true})
 
@@ -160,10 +164,17 @@ app.controller 'PatientShowCtrl', ($rootScope, $scope, $routeParams, $fhir) ->
   $rootScope.progress = $fhir.read url , (data)->
     $scope.patient = data.content
 
+  url = BASE_URL + "/Patient/#{$routeParams.id}/_history?_format=application/json"
+  $rootScope.progress = $fhir.read url, (data)->
+    $scope.history = data.content
+
   $scope.deletePatient = ()->
     url = BASE_URL + "/Patient/#{$routeParams.id}"
     $rootScope.progress = $fhir["delete"] url, ()->
       $location.path("/patients/")
+
+  $scope.switchVersion = ()->
+    $scope.patient = $scope.pt.selectedVersion.content
 
 baseMrn = {
   "use": "usual",
@@ -256,8 +267,7 @@ app.controller 'PatientHistoryCtrl', ($rootScope, $location, $scope, $routeParam
   url = BASE_URL + "/Patient/#{$routeParams.id}/_history?_format=application/json"
   $rootScope.progress = $fhir.read url, (data)->
     $scope.history = data.content
-    console.log $scope.history
-    #console.log mapResources(data)
+
 
 
 

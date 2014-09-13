@@ -1,5 +1,5 @@
 <div class="row">
-  <div clas="col-md-3">
+  <div class="col-md-3">
     <img ng-src="{{patient.photo | dataUrl}}" class="person-photo large"/>
   </div>
   <div clas="col-md-9">
@@ -9,6 +9,15 @@
   </div>
 </div>
 
+<div class="row">
+  <div class="col-xs-5">
+    <fs-form-for model="pt">
+      <fieldset>
+        <fs-input as="fs-select" ng-change="switchVersion()" name="selectedVersion" items="history.entry" label="Versions">{{item.updated | date:'MM/dd/yyyy @ h:mma'}}</fs-input>
+      </fieldset>  
+    </fs-form-for>
+  </div>
+</div>
 
 <h3> Names </h3>
 <hr/>
@@ -53,4 +62,3 @@
 <div class="btns">
   <a class="btn" ng-click="deletePatient()">Delete</a>
 </div>
-

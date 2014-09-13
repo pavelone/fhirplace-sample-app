@@ -263,7 +263,7 @@ angular.module('regi').run(['$templateCache', function($templateCache) {
 
   $templateCache.put('/views/patients/show.html',
     "<div class=\"row\">\n" +
-    "  <div clas=\"col-md-3\">\n" +
+    "  <div class=\"col-md-3\">\n" +
     "    <img ng-src=\"{{patient.photo | dataUrl}}\" class=\"person-photo large\"/>\n" +
     "  </div>\n" +
     "  <div clas=\"col-md-9\">\n" +
@@ -273,6 +273,15 @@ angular.module('regi').run(['$templateCache', function($templateCache) {
     "  </div>\n" +
     "</div>\n" +
     "\n" +
+    "<div class=\"row\">\n" +
+    "  <div class=\"col-xs-5\">\n" +
+    "    <fs-form-for model=\"pt\">\n" +
+    "      <fieldset>\n" +
+    "        <fs-input as=\"fs-select\" ng-change=\"switchVersion()\" name=\"selectedVersion\" items=\"history.entry\" label=\"Versions\">{{item.updated | date:'MM/dd/yyyy @ h:mma'}}</fs-input>\n" +
+    "      </fieldset>  \n" +
+    "    </fs-form-for>\n" +
+    "  </div>\n" +
+    "</div>\n" +
     "\n" +
     "<h3> Names </h3>\n" +
     "<hr/>\n" +
@@ -316,8 +325,7 @@ angular.module('regi').run(['$templateCache', function($templateCache) {
     "\n" +
     "<div class=\"btns\">\n" +
     "  <a class=\"btn\" ng-click=\"deletePatient()\">Delete</a>\n" +
-    "</div>\n" +
-    "\n"
+    "</div>\n"
   );
 
 
