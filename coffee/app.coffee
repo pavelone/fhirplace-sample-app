@@ -1,5 +1,9 @@
 'use strict'
 
+BASE_URL = null
+baseUrl = ()->
+  BASE_URL ||  "#{window.location.protocol}//#{window.location.host}"
+
 app = angular.module 'regi', [
   'ngCookies',
   'ngAnimate',
@@ -28,9 +32,6 @@ app = angular.module 'regi', [
       .otherwise
         redirectTo: '/'
 
-BASE_URL = 'http://try-fhirplace.hospital-systems.com'
-
-app.config ($fhirProvider)-> $fhirProvider.baseUrl = BASE_URL
 
 defaultMenu = [{url: '/patients', label: 'Patients'},
                {url: "/patients/new", label: "Register", icon: "fa-plus"}]
@@ -80,6 +81,12 @@ formatAddress = (ad)->
 
 app.filter 'address', mkFilter(formatAddress)
 
+app.filter 'urlFor', ()->
+  (pt)->
+    parts = pt._id.split(/\//)
+    id = parts[parts.length - 1]
+    "#/patients/#{id}"
+
 age = (date)->
   ms = new Date() - new Date(date)
   "#{Math.round(ms/(1000*60*60*24*365))} y"
@@ -102,7 +109,11 @@ telecomUses = ['home','work','temp','old','mobile']
 
 addressUses = ['home','work','temp','old']
 
-app.run ($rootScope)->
+
+app.config ($fhirProvider)->
+  $fhirProvider.baseUrl = baseUrl()
+
+app.run ($rootScope, $location)->
   $rootScope.menu = menu()
   $rootScope.$watch 'progress', (v)->
     return unless v && v.success
@@ -131,8 +142,10 @@ app.controller 'PatientsIndexCtrl', ($rootScope, $scope, $routeParams, $fhir) ->
   search = (inp)->
     params = {}
     params.name = inp if inp?
-    $rootScope.progress = $fhir.search 'Patient', params, (data)->
-      $scope.patients = mapResources(data)
+    $rootScope.progress = $fhir.search('Patient', params,)
+      .success (data)->
+        console.log(data)
+        $scope.patients = mapResources(data)
 
   $scope.search = ()->
     if $scope.query?
@@ -149,7 +162,7 @@ app.controller 'PatientShowCtrl', ($rootScope, $scope, $routeParams, $fhir) ->
 
   $rootScope.menu.push({icon: 'fa-edit', url:  "/patients/#{$routeParams.id}/edit", label: 'edit'})
 
-  url = BASE_URL + "/Patient/#{$routeParams.id}?_format=application/json"
+  url = baseUrl() + "/Patient/#{$routeParams.id}?_format=application/json"
   $rootScope.progress = $fhir.read url , (data)->
     $scope.patient = data.content
 
@@ -211,7 +224,7 @@ app.controller 'PatientEditCtrl', ($rootScope, $location, $scope, $routeParams, 
 
   $rootScope.menu.push({active: true, icon: 'fa-edit', url:  "/patients/#{ptId}/edit", label: 'edit'})
 
-  ptUrl = BASE_URL + "/Patient/#{ptId}?_format=application/json"
+  ptUrl = baseUrl() + "/Patient/#{ptId}?_format=application/json"
 
   $rootScope.progress = $fhir.read ptUrl, (data)->
     $scope.ptVersion = data.id

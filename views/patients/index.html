@@ -3,7 +3,6 @@
     <input class="form-control search" ng-model="query" placeholder="Search by name or mrn"/>
   </form>
 </div>
-
 <table class="table table-compact">
   <thead>
     <tr>
@@ -16,7 +15,7 @@
   <tr ng-repeat="pt in patients">
     <td>
       <img alt="photo" ng-src="{{pt.photo | dataUrl}}" class="person-photo small"/>
-      <a href="#/patients/{{pt._id}}"> {{pt.name | humanName }}</a>
+      <a href="{{pt | urlFor}}"> {{pt.name | humanName }}</a>
     </td>
     <td> {{pt.gender.coding[0].display }} </td>
     <td> {{pt.birthDate | age}} / {{pt.birthDate}}</td>
