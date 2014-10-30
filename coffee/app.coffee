@@ -1,6 +1,7 @@
 'use strict'
 
-BASE_URL = null
+#BASE_URL = null
+BASE_URL = 'http://try-fhirplace.hospital-systems.com'
 baseUrl = ()->
   BASE_URL ||  "#{window.location.protocol}//#{window.location.host}"
 

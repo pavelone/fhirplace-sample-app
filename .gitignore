@@ -12,6 +12,7 @@ pom.xml.asc
 *sw?
 **/.#*
 **/#*#
+underfined/
 
 # JavaScript Single Page Application.
 .sass-cache

@@ -10,7 +10,7 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks('grunt-contrib-connect');
 
   var app_name = 'regi'
-  var app_prefix = process.env.PREFIX ? (process.env.PREFIX + '/') : ('../fhirplace/resources/public/' + app_name + '/');
+  var app_prefix = process.env.PREFIX + '/' || '../fhirplace/resources/public/' + app_name + '/';
 
   var main_js = app_prefix + 'main.js';
 
@@ -110,17 +110,31 @@ module.exports = function (grunt) {
        dest: app_prefix + 'index.html'
      }
     },
+    connect: {
+      server: {
+        options: {
+          hostname: 'localhost',
+          port: 9001,
+          base: app_prefix,
+          open: true,
+          livereload: true
+        }
+      }
+    },
     watch: {
       main: {
         files: ['views/**/*', 'index.html','coffee/**/*.coffee', 'less/**/*.less'],
         tasks: ['build'],
         options: {
           events: ['changed', 'added'],
-          nospawn: true
+          nospawn: true,
+          livereload: true
         }
       }
     }
   });
 
   grunt.registerTask('build', ['clean', 'coffee', 'less', 'ngtemplates', 'concat', 'copy']);
+
+  grunt.registerTask('serve', 'Compile then start a connect web server', ['build', 'connect', 'watch']);
 };
