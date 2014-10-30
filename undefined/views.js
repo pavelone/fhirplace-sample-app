@@ -193,6 +193,35 @@ angular.module('regi').run(['$templateCache', function($templateCache) {
   );
 
 
+  $templateCache.put('/views/patients/observations.html',
+    "<div class=\"row\">\n" +
+    "  <div clas=\"col-md-3\">\n" +
+    "    <img ng-src=\"{{patient.photo | dataUrl}}\" class=\"person-photo large\"/>\n" +
+    "  </div>\n" +
+    "  <div clas=\"col-md-9\">\n" +
+    "    <h1> {{ patient.name[0] | humanName }}\n" +
+    "      <br/>\n" +
+    "      {{patient.gender.coding[0].code || '~'}}/{{ patient.birthDate | age}}</h1>\n" +
+    "  </div>\n" +
+    "</div>\n" +
+    "\n" +
+    "<div>\n" +
+    "  <h3>Weight Record</h3>\n" +
+    "</div>\n" +
+    "<div ng-repeat=\"entry in observations.entry | orderBy:'content.appliesDateTime':false\" class=\"small\">\n" +
+    "  <div class=\"col-xs-3\">Recorded: {{entry.content.appliesDateTime | date:'MM/dd/yyyy @ h:mma'}}</div>\n" +
+    "  <div class=\"col-xs-9\">\n" +
+    "    <span>Weight: </span><span>{{entry.content.valueQuantity.value+\" \"+entry.content.valueQuantity.units}}</span>\n" +
+    "  </div>\n" +
+    "</div>\n" +
+    "\n" +
+    "<br><br>\n" +
+    "\n" +
+    "<h3>FHIR resource</h3>\n" +
+    "<pre>{{observations | json}}</pre>"
+  );
+
+
   $templateCache.put('/views/patients/show.html',
     "<div class=\"row\">\n" +
     "  <div clas=\"col-md-3\">\n" +

@@ -1,0 +1,40 @@
+{
+  "resourceType": "Observation",
+  "text": {
+    "status": "generated",
+    "div": "<div>Jan 31 2014: Body Weight = 190 lbs</div>"
+  },
+  "name": {
+    "coding": [
+      {
+        "system": "http://loinc.org",
+        "code": "3141-9",
+        "display": "Weight Measured"
+      },
+      {
+        "system": "http://snomed.info/sct",
+        "code": "27113001",
+        "display": "Body weight"
+      },
+      {
+        "system": "http://acme.org/devices/clinical-codes",
+        "code": "body-weight",
+        "display": "Body Weight"
+      }
+    ]
+  },
+  "valueQuantity": {
+    "value": 190,
+    "units": "lbs",
+    "system": "http://unitsofmeasure.org",
+    "code": "[lb_av]"
+  },
+  "status": "final",
+  "reliability": "ok",
+  "appliesDateTime": "2014-01-31",
+  "issued": "2014-01-31T14:34:00+01:00",
+  "subject": {
+    "reference": "Patient/4c928a2d-af50-4d14-ac7e-772daee93032",
+    "display": "smirnov pavel"
+  }
+}

@@ -25,6 +25,9 @@
     }).when('/patients/:id/edit', {
       templateUrl: '/views/patients/edit.html',
       controller: 'PatientEditCtrl'
+    }).when('/patients/:id/observations', {
+      templateUrl: '/views/patients/observations.html',
+      controller: 'PatientObservationsCtrl'
     }).otherwise({
       redirectTo: '/'
     });
@@ -213,6 +216,12 @@
       url: "/patients/" + $routeParams.id + "/edit",
       label: 'edit'
     });
+    $rootScope.menu.push({
+      icon: 'fa-th-list',
+      url: "/patients/" + $routeParams.id + "/observations",
+      label: 'observations',
+      guess: true
+    });
     url = baseUrl() + ("/Patient/" + $routeParams.id + "?_format=application/json");
     return $rootScope.progress = $fhir.read(url, function(data) {
       return $scope.patient = data.content;
@@ -327,6 +336,29 @@
         return $location.path("/patients/" + ptId);
       });
     };
+  });
+
+  app.controller('PatientObservationsCtrl', function($rootScope, $location, $scope, $routeParams, $fhir) {
+    var menuItem, url;
+    $rootScope.menu = angular.copy(defaultMenu);
+    menuItem = $rootScope.menu[1];
+    menuItem.label = $routeParams.id;
+    menuItem.icon = null;
+    menuItem.url = "/patients/" + $routeParams.id;
+    $rootScope.menu.push({
+      active: true,
+      icon: 'fa-th-list',
+      url: "/patients/" + $routeParams.id + "/observations",
+      label: 'observations'
+    });
+    url = baseUrl() + ("/Patient/" + $routeParams.id + "?_format=application/json");
+    $rootScope.progress = $fhir.read(url, function(data) {
+      return $scope.patient = data.content;
+    });
+    url = BASE_URL + ("/Observation/_search?subject=" + $routeParams.id);
+    return $rootScope.progress = $fhir.read(url, function(data) {
+      return $scope.observations = data.content;
+    });
   });
 
 }).call(this);
@@ -523,6 +555,35 @@ angular.module('regi').run(['$templateCache', function($templateCache) {
     "  <a class=\"btn btn-success\" ng-click=\"register()\">Register</a>\n" +
     "  <a class=\"btn btn-default\" href=\"#/patients\">cancel</a>\n" +
     "</div>\n"
+  );
+
+
+  $templateCache.put('/views/patients/observations.html',
+    "<div class=\"row\">\n" +
+    "  <div clas=\"col-md-3\">\n" +
+    "    <img ng-src=\"{{patient.photo | dataUrl}}\" class=\"person-photo large\"/>\n" +
+    "  </div>\n" +
+    "  <div clas=\"col-md-9\">\n" +
+    "    <h1> {{ patient.name[0] | humanName }}\n" +
+    "      <br/>\n" +
+    "      {{patient.gender.coding[0].code || '~'}}/{{ patient.birthDate | age}}</h1>\n" +
+    "  </div>\n" +
+    "</div>\n" +
+    "\n" +
+    "<div>\n" +
+    "  <h3>Weight Record</h3>\n" +
+    "</div>\n" +
+    "<div ng-repeat=\"entry in observations.entry | orderBy:'content.appliesDateTime':false\" class=\"small\">\n" +
+    "  <div class=\"col-xs-3\">Recorded: {{entry.content.appliesDateTime | date:'MM/dd/yyyy @ h:mma'}}</div>\n" +
+    "  <div class=\"col-xs-9\">\n" +
+    "    <span>Weight: </span><span>{{entry.content.valueQuantity.value+\" \"+entry.content.valueQuantity.units}}</span>\n" +
+    "  </div>\n" +
+    "</div>\n" +
+    "\n" +
+    "<br><br>\n" +
+    "\n" +
+    "<h3>FHIR resource</h3>\n" +
+    "<pre>{{observations | json}}</pre>"
   );
 
 
