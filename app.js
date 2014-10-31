@@ -9,7 +9,7 @@
     return BASE_URL || ("" + window.location.protocol + "//" + window.location.host);
   };
 
-  app = angular.module('regi', ['ngCookies', 'ngAnimate', 'ngSanitize', 'formstamp', 'ngRoute', 'ngFileReader', 'ng-fhir'], function($routeProvider) {
+  app = angular.module('regi', ['ngCookies', 'ngAnimate', 'ngSanitize', 'formstamp', 'ngRoute', 'ngFileReader', 'ng-fhir', 'highcharts-ng'], function($routeProvider) {
     return $routeProvider.when('/', {
       templateUrl: '/views/patients/index.html',
       controller: 'PatientsIndexCtrl'
@@ -351,13 +351,43 @@
       url: "/patients/" + $routeParams.id + "/observations",
       label: 'observations'
     });
+    $scope.chartConfig = {
+      options: {
+        chart: {
+          type: 'line',
+          zoomType: 'x'
+        }
+      },
+      series: [
+        {
+          data: []
+        }
+      ],
+      title: {
+        text: 'Weight chart'
+      },
+      xAxis: {
+        currentMin: 0,
+        currentMax: 10,
+        minRange: 1
+      },
+      loading: false
+    };
     url = baseUrl() + ("/Patient/" + $routeParams.id + "?_format=application/json");
     $rootScope.progress = $fhir.read(url, function(data) {
       return $scope.patient = data.content;
     });
     url = BASE_URL + ("/Observation/_search?subject=" + $routeParams.id);
     return $rootScope.progress = $fhir.read(url, function(data) {
-      return $scope.observations = data.content;
+      var entry, _i, _len, _ref, _results;
+      $scope.observations = data.content;
+      _ref = $scope.observations.entry;
+      _results = [];
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        entry = _ref[_i];
+        _results.push($scope.chartConfig.series[0].data.push(entry.content.valueQuantity.value));
+      }
+      return _results;
     });
   });
 
@@ -570,15 +600,19 @@ angular.module('regi').run(['$templateCache', function($templateCache) {
     "  </div>\n" +
     "</div>\n" +
     "\n" +
-    "<div>\n" +
-    "  <h3>Weight Record</h3>\n" +
-    "</div>\n" +
-    "<div ng-repeat=\"entry in observations.entry | orderBy:'content.appliesDateTime':false\" class=\"small\">\n" +
-    "  <div class=\"col-xs-3\">Recorded: {{entry.content.appliesDateTime | date:'MM/dd/yyyy @ h:mma'}}</div>\n" +
-    "  <div class=\"col-xs-9\">\n" +
-    "    <span>Weight: </span><span>{{entry.content.valueQuantity.value+\" \"+entry.content.valueQuantity.units}}</span>\n" +
+    "<div class=\"row\">\n" +
+    "  <div>\n" +
+    "    <h3>Weight Record</h3>\n" +
+    "  </div>\n" +
+    "  <div ng-repeat=\"entry in observations.entry | orderBy:'content.appliesDateTime':false\" class=\"small\">\n" +
+    "    <div class=\"col-xs-3\">Recorded: {{entry.content.appliesDateTime | date:'MM/dd/yyyy @ h:mma'}}</div>\n" +
+    "    <div class=\"col-xs-9\">\n" +
+    "      <span>Weight: </span><span>{{entry.content.valueQuantity.value+\" \"+entry.content.valueQuantity.units}}</span>\n" +
+    "    </div>\n" +
     "  </div>\n" +
     "</div>\n" +
+    "\n" +
+    "<highchart id=\"chart1\" config=\"chartConfig\" class=\"span10\"></highchart>\n" +
     "\n" +
     "<br><br>\n" +
     "\n" +
