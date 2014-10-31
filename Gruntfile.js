@@ -63,7 +63,9 @@ module.exports = function (grunt) {
           "lib/angular-cookies/angular-cookies.js",
           "lib/angular-sanitize/angular-sanitize.js",
           "lib/angular-formstamp/build/formstamp.js",
-          "lib/fhir.js/dist/ngFhir.js"
+          "lib/fhir.js/dist/ngFhir.js",
+          "lib/highcharts-ng/dist/highcharts-ng.js",
+          "lib/highcharts-ng/dist/highstock.src.js"          
         ],
         dest: app_prefix + 'lib.js'
       },

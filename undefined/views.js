@@ -205,15 +205,19 @@ angular.module('regi').run(['$templateCache', function($templateCache) {
     "  </div>\n" +
     "</div>\n" +
     "\n" +
-    "<div>\n" +
-    "  <h3>Weight Record</h3>\n" +
-    "</div>\n" +
-    "<div ng-repeat=\"entry in observations.entry | orderBy:'content.appliesDateTime':false\" class=\"small\">\n" +
-    "  <div class=\"col-xs-3\">Recorded: {{entry.content.appliesDateTime | date:'MM/dd/yyyy @ h:mma'}}</div>\n" +
-    "  <div class=\"col-xs-9\">\n" +
-    "    <span>Weight: </span><span>{{entry.content.valueQuantity.value+\" \"+entry.content.valueQuantity.units}}</span>\n" +
+    "<div class=\"row\">\n" +
+    "  <div>\n" +
+    "    <h3>Weight Record</h3>\n" +
+    "  </div>\n" +
+    "  <div ng-repeat=\"entry in observations.entry | orderBy:'content.appliesDateTime':false\" class=\"small\">\n" +
+    "    <div class=\"col-xs-3\">Recorded: {{entry.content.appliesDateTime | date:'MM/dd/yyyy @ h:mma'}}</div>\n" +
+    "    <div class=\"col-xs-9\">\n" +
+    "      <span>Weight: </span><span>{{entry.content.valueQuantity.value+\" \"+entry.content.valueQuantity.units}}</span>\n" +
+    "    </div>\n" +
     "  </div>\n" +
     "</div>\n" +
+    "\n" +
+    "<highchart id=\"chart1\" config=\"chartConfig\" class=\"span10\"></highchart>\n" +
     "\n" +
     "<br><br>\n" +
     "\n" +

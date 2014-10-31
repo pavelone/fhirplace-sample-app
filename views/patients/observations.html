@@ -9,15 +9,19 @@
   </div>
 </div>
 
-<div>
-  <h3>Weight Record</h3>
-</div>
-<div ng-repeat="entry in observations.entry | orderBy:'content.appliesDateTime':false" class="small">
-  <div class="col-xs-3">Recorded: {{entry.content.appliesDateTime | date:'MM/dd/yyyy @ h:mma'}}</div>
-  <div class="col-xs-9">
-    <span>Weight: </span><span>{{entry.content.valueQuantity.value+" "+entry.content.valueQuantity.units}}</span>
+<div class="row">
+  <div>
+    <h3>Weight Record</h3>
+  </div>
+  <div ng-repeat="entry in observations.entry | orderBy:'content.appliesDateTime':false" class="small">
+    <div class="col-xs-3">Recorded: {{entry.content.appliesDateTime | date:'MM/dd/yyyy @ h:mma'}}</div>
+    <div class="col-xs-9">
+      <span>Weight: </span><span>{{entry.content.valueQuantity.value+" "+entry.content.valueQuantity.units}}</span>
+    </div>
   </div>
 </div>
+
+<highchart id="chart1" config="chartConfig" class="span10"></highchart>
 
 <br><br>
 

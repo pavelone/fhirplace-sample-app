@@ -12,7 +12,8 @@ app = angular.module 'regi', [
   'formstamp',
   'ngRoute',
   'ngFileReader',
-  'ng-fhir'
+  'ng-fhir',
+  'highcharts-ng'
 ], ($routeProvider) ->
     $routeProvider
       .when '/',
@@ -254,6 +255,23 @@ app.controller 'PatientObservationsCtrl', ($rootScope, $location, $scope, $route
 
   $rootScope.menu.push({active: true, icon: 'fa-th-list', url:  "/patients/#{$routeParams.id}/observations", label: 'observations'})
 
+  $scope.chartConfig = {
+        options: {
+            chart: {
+                type: 'line',
+                zoomType: 'x'
+            }
+        },
+        series: [{
+            data: []
+        }],
+        title: {
+            text: 'Weight chart'
+        },
+        xAxis: {currentMin: 0, currentMax: 10, minRange: 1},
+        loading: false
+    }
+
   url = baseUrl() + "/Patient/#{$routeParams.id}?_format=application/json"
   $rootScope.progress = $fhir.read url , (data)->
     $scope.patient = data.content
@@ -261,5 +279,7 @@ app.controller 'PatientObservationsCtrl', ($rootScope, $location, $scope, $route
   url = BASE_URL + "/Observation/_search?subject=#{$routeParams.id}"
   $rootScope.progress = $fhir.read url, (data)->
     $scope.observations = data.content
+    for entry in $scope.observations.entry
+      $scope.chartConfig.series[0].data.push entry.content.valueQuantity.value
 
-
+  
