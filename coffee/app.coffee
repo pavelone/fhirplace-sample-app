@@ -279,7 +279,20 @@ app.controller 'PatientObservationsCtrl', ($rootScope, $location, $scope, $route
   url = BASE_URL + "/Observation/_search?subject=#{$routeParams.id}"
   $rootScope.progress = $fhir.read url, (data)->
     $scope.observations = data.content
+    items = []
+    compare = (a, b)->
+      if a.time > b.time
+        return 1
+      if a.time < b.time
+        return -1
+      return 0
     for entry in $scope.observations.entry
-      $scope.chartConfig.series[0].data.push entry.content.valueQuantity.value
+      items.push {time : entry.content.appliesDateTime, weight : entry.content.valueQuantity.value}
+      items.sort compare
+
+    for item in items
+      $scope.chartConfig.series[0].data.push item.weight
+    
+
 
   

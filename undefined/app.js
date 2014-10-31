@@ -379,13 +379,31 @@
     });
     url = BASE_URL + ("/Observation/_search?subject=" + $routeParams.id);
     return $rootScope.progress = $fhir.read(url, function(data) {
-      var entry, _i, _len, _ref, _results;
+      var compare, entry, item, items, _i, _j, _len, _len1, _ref, _results;
       $scope.observations = data.content;
+      items = [];
+      compare = function(a, b) {
+        if (a.time > b.time) {
+          return 1;
+        }
+        if (a.time < b.time) {
+          return -1;
+        }
+        return 0;
+      };
       _ref = $scope.observations.entry;
-      _results = [];
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         entry = _ref[_i];
-        _results.push($scope.chartConfig.series[0].data.push(entry.content.valueQuantity.value));
+        items.push({
+          time: entry.content.appliesDateTime,
+          weight: entry.content.valueQuantity.value
+        });
+        items.sort(compare);
+      }
+      _results = [];
+      for (_j = 0, _len1 = items.length; _j < _len1; _j++) {
+        item = items[_j];
+        _results.push($scope.chartConfig.series[0].data.push(item.weight));
       }
       return _results;
     });
